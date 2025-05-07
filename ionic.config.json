@@ -1,0 +1,7 @@
+{
+  "name": "CheerUp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
