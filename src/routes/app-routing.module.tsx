@@ -17,7 +17,9 @@ const AppRoutes: React.FC = () => {
           <Route exact path="/admin" />
           
           {/* Rutas del Entrenador */}
-          <Route path="/entrenador" component={EntrenadorLayout} />
+          <Route path="/entrenador" component={EntrenadorLayout}>
+            <EntrenadorLayout />          
+          </Route>
 
           <Route exact path="/deportista">
             <div>Página de Deportista</div>

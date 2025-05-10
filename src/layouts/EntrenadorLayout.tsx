@@ -24,7 +24,7 @@ import {
   clipboard,
   calendar
 } from 'ionicons/icons';
-import { Route, useHistory, useLocation } from 'react-router-dom';
+import { Route, useHistory, useLocation, Redirect } from 'react-router-dom';
 import { AuthService } from '../services/auth.service';
 import DashboardPage from '../pages/entrenador/dashboard.page';
 import EquiposPage from '../pages/entrenador/equipo.page';
@@ -45,11 +45,10 @@ const EntrenadorLayout: React.FC = () => {
     history.push('/login');
   };
 
-  return (
-    <IonPage>
+  return (    
         <IonTabs>
           <IonRouterOutlet>
-          <Route exact path="/entrenador/dashboard" component={DashboardPage} />
+            <Route exact path="/entrenador/dashboard" component={DashboardPage} />
             <Route exact path="/entrenador/equipos" component={EquiposPage} />          
             <Route exact path="/entrenador/equipos/:equipoId/deportistas" component={EquipoDeportistaPage} />
             <Route exact path="/entrenador/deportistas" component={DeportistasPage} />
@@ -67,6 +66,9 @@ const EntrenadorLayout: React.FC = () => {
               <div className="ion-padding">
                 <h2>Notificaciones</h2>
               </div>
+            </Route>
+            <Route exact path="/entrenador">
+              <Redirect to="/entrenador/dashboard" />
             </Route>
           </IonRouterOutlet>
           <IonTabBar slot="bottom">
@@ -100,7 +102,6 @@ const EntrenadorLayout: React.FC = () => {
             </IonTabButton>
           </IonTabBar>
         </IonTabs>
-    </IonPage>
   );
 };
 

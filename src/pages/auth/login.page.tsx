@@ -34,7 +34,7 @@ const Login: React.FC = () => {
       try {
         const userData = JSON.parse(user);
         if (userData && userData.tipo_usuario) {
-          history.push(`/${userData.tipo_usuario}/dashboard`);
+          history.replace(`/${userData.tipo_usuario}/dashboard`);
         }
       } catch (error) {
         console.error('Error al verificar sesión:', error);
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
             history.push('/admin/dashboard');
             break;
           case 'entrenador':
-            history.push('/entrenador/dashboard');
+            history.replace('/entrenador/dashboard');
             break;
           case 'deportista':
             history.push('/deportista/dashboard');
