@@ -1,0 +1,13 @@
+ion-content {
+  --background: #000000;
+}
+
+form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+ion-button {
+  margin-top: 20px;
+} 

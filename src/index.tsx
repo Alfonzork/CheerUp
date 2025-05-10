@@ -1,6 +1,6 @@
 import React from 'react';
+import { createRoot } from 'react-dom/client';
 import AppRoutes from './routes/app-routing.module';
-import { setupIonicReact } from '@ionic/react';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -18,24 +18,10 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
-import '@ionic/react/css/palettes/dark.system.css';
-
-/* Theme variables */
-import './theme/variables.css';
-
-setupIonicReact();
-
-const App: React.FC = () => (
-  <AppRoutes />
-);
-
-export default App;
+const container = document.getElementById('root');
+const root = createRoot(container!);
+root.render(
+  <React.StrictMode>
+    <AppRoutes />
+  </React.StrictMode>
+); 

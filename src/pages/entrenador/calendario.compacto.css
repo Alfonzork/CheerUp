@@ -1,0 +1,30 @@
+/* Estilos compactos para FullCalendar */
+.fc .fc-toolbar-title {
+  font-size: 1.1rem;
+}
+.fc .fc-button {
+  padding: 2px 8px;
+  font-size: 0.85rem;
+}
+.fc .fc-col-header-cell-cushion {
+  padding: 2px 0;
+  font-size: 0.85rem;
+}
+.fc .fc-daygrid-day-number {
+  padding: 0 2px;
+  font-size: 0.85rem;
+}
+.fc .fc-daygrid-day-frame {
+  min-height: 22px;
+  padding: 1px;
+}
+.fc .fc-daygrid-day {
+  height: 28px;
+}
+.fc .fc-scrollgrid-sync-table {
+  min-height: 0 !important;
+}
+.fc .fc-event {
+  font-size: 0.8rem;
+  padding: 0 2px;
+} 
