@@ -10,7 +10,6 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonLoading,
   IonToast,
   IonBackButton
 } from '@ionic/react';
@@ -18,6 +17,7 @@ import { arrowBack } from 'ionicons/icons';
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { deportistaService } from '../../services/deportistas.service';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 const DeportistaDetalle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -116,7 +116,7 @@ const DeportistaDetalle: React.FC = () => {
           </IonList>
         )}
 
-        <IonLoading isOpen={loading} message="Cargando..." />
+        <LoadingOverlay isOpen={loading} message="Cargando..." />
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}

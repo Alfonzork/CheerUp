@@ -16,7 +16,6 @@ import {
     IonSelect,
     IonSelectOption,
     IonButtons,
-    IonLoading,
     IonToast,
     IonDatetime,
     IonChip,
@@ -28,6 +27,10 @@ import {
   import { tareaService } from '../../services/tareas.service';
   import { subscribeToChanges } from '../../services/changes.service';
   import { Tarea, Equipo } from '../../models/supabase.model';
+  import LoadingOverlay from '../../components/LoadingOverlay';
+  import AccessibleModal from '../../components/AccessibleModal';
+  import AccessibleAlert from '../../components/AccessibleAlert';
+  import { AuthService } from '../../services/auth.service';
   
   const Tareas: React.FC = () => {
     const [tareas, setTareas] = useState<Tarea[]>([]);
@@ -41,10 +44,12 @@ import {
     const [formData, setFormData] = useState({
       titulo: '',
       descripcion: '',
-      fecha_limite: '',
+      fecha_vencimiento: '',
       estado: 'pendiente' as 'pendiente' | 'en_progreso' | 'completada',
       equipo_id: ''
     });
+    const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+    const [tareaToDelete, setTareaToDelete] = useState<string | null>(null);
   
     const cargarDatos = async () => {
       try {
@@ -82,12 +87,13 @@ import {
       e.preventDefault();
       setLoading(true);
       try {
+        const user = AuthService.getCurrentUser();
         const tareaData = {
           ...formData,
-          equipo_id: parseInt(formData.equipo_id),
-          entrenador_id: 1,
+          equipo_id: formData.equipo_id,
+          entrenador_id: user?.id || '',
           updated_at: new Date().toISOString(),
-          fecha_vencimiento: formData.fecha_limite
+          fecha_vencimiento: formData.fecha_vencimiento
         };
   
         if (tareaEditar) {
@@ -108,10 +114,17 @@ import {
       }
     };
   
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
+      setTareaToDelete(id);
+      setShowDeleteAlert(true);
+    };
+  
+    const confirmDelete = async () => {
+      if (!tareaToDelete) return;
+      
       setLoading(true);
       try {
-        await tareaService.delete(id);
+        await tareaService.delete(tareaToDelete);
         setToastMessage('Tarea eliminada correctamente');
         cargarDatos();
       } catch (error) {
@@ -119,6 +132,7 @@ import {
         setToastMessage('Error al eliminar la tarea');
       } finally {
         setLoading(false);
+        setTareaToDelete(null);
       }
     };
   
@@ -127,7 +141,7 @@ import {
       setFormData({
         titulo: tarea.titulo,
         descripcion: tarea.descripcion,
-        fecha_limite: tarea.fecha_limite,
+        fecha_vencimiento: tarea.fecha_vencimiento,
         estado: tarea.estado as 'pendiente' | 'en_progreso' | 'completada',
         equipo_id: tarea.equipo_id.toString()
       });
@@ -139,7 +153,7 @@ import {
       setFormData({
         titulo: '',
         descripcion: '',
-        fecha_limite: '',
+        fecha_vencimiento: '',
         estado: 'pendiente',
         equipo_id: ''
       });
@@ -172,8 +186,8 @@ import {
       }
     };
   
-    const getEquipoNombre = (equipoId: number) => {
-      const equipo = equipos.find(e => e.id === equipoId);
+    const getEquipoNombre = (equipoId: string) => {
+      const equipo = equipos.find(e => e.id.toString() === equipoId);
       return equipo ? equipo.nombre : 'Sin equipo';
     };
   
@@ -216,19 +230,21 @@ import {
           <IonList>
             {tareasFiltradas.map((tarea) => (
               <IonItem key={tarea.id}>
-                <IonIcon icon={list} slot="start" />
                 <IonLabel>
-                  <h2>{tarea.titulo}</h2>
-                  <p>{tarea.descripcion}</p>
                   <p>
                     <IonChip color={getEstadoColor(tarea.estado)}>
                       {getEstadoTexto(tarea.estado)}
                     </IonChip>
                   </p>
+                </IonLabel>
+                <IonLabel>
+                  <h2>{tarea.titulo}</h2>
+                  <p>{tarea.descripcion}</p>
+                  
                   <p>
-                    <IonIcon icon={time} /> {new Date(tarea.fecha_limite).toLocaleDateString()}
+                    <IonIcon icon={time} /> {new Date(tarea.fecha_vencimiento).toLocaleDateString()}
                   </p>
-                  <p>Equipo: {getEquipoNombre(tarea.equipo_id)}</p>
+                  <p>Equipo: {getEquipoNombre(tarea.equipo_id.toString())}</p>
                 </IonLabel>
                 <IonButtons slot="end">
                   <IonButton onClick={() => abrirModalEditar(tarea)}>
@@ -243,13 +259,13 @@ import {
           </IonList>
   
           <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton onClick={abrirModalCrear}>
+            <IonFabButton onClick={abrirModalCrear} color="warning">
               <IonIcon icon={add} />
             </IonFabButton>
           </IonFab>
   
-          <IonModal 
-            isOpen={showModal} 
+          <AccessibleModal
+            isOpen={showModal}
             onDidDismiss={() => setShowModal(false)}
             breakpoints={[0, 0.8]}
             initialBreakpoint={0.8}
@@ -281,8 +297,8 @@ import {
                   type="date"
                   label="Fecha Límite"
                   labelPlacement="floating"
-                  value={formData.fecha_limite}
-                  onIonChange={e => setFormData({...formData, fecha_limite: e.detail.value!})}
+                  value={formData.fecha_vencimiento}
+                  onIonChange={e => setFormData({...formData, fecha_vencimiento: e.detail.value!})}
                   required
                 />
                 <IonSelect
@@ -314,14 +330,35 @@ import {
                 </IonButton>
               </form>
             </IonContent>
-          </IonModal>
+          </AccessibleModal>
   
-          <IonLoading isOpen={loading} message="Cargando..." />
+          <LoadingOverlay isOpen={loading} message="Cargando..." />
           <IonToast
             isOpen={showToast}
             onDidDismiss={() => setShowToast(false)}
             message={toastMessage}
             duration={2000}
+          />
+  
+          <AccessibleAlert
+            isOpen={showDeleteAlert}
+            onDidDismiss={() => {
+              setShowDeleteAlert(false);
+              setTareaToDelete(null);
+            }}
+            header="Confirmar eliminación"
+            message="¿Está seguro que desea eliminar esta tarea? Esta acción no se puede deshacer."
+            buttons={[
+              {
+                text: 'Cancelar',
+                role: 'cancel',
+                cssClass: 'secondary'
+              },
+              {
+                text: 'Eliminar',
+                handler: confirmDelete
+              }
+            ]}
           />
         </IonContent>
       </IonPage>

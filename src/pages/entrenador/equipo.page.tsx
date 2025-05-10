@@ -15,7 +15,6 @@ import {
     IonInput,
     IonTextarea,
     IonButtons,
-    IonLoading,
     IonToast,
     IonImg,
     IonAvatar,
@@ -31,6 +30,8 @@ import {
   import { Equipo } from '../../models/supabase.model';
   import { supabase, SUPABASE_STORAGE_URL } from '../../services/supabase.service';
   import { useHistory } from 'react-router';
+  import LoadingOverlay from '../../components/LoadingOverlay';
+  import AccessibleModal from '../../components/AccessibleModal';
   
   interface Entrenador {
     id: number;
@@ -196,7 +197,7 @@ import {
     };
   
     const getImageUrl = (imagePath: string) => {
-      if (!imagePath) return 'public/default_cheer.jpg';
+      if (!imagePath) return 'default_cheer.jpg';
       if (imagePath.startsWith('http')) return imagePath;
       return `${SUPABASE_STORAGE_URL}/equipos/${imagePath}`;
     };
@@ -273,7 +274,7 @@ import {
             </>
           )}
   
-          <IonModal 
+          <AccessibleModal
             isOpen={showModal} 
             onDidDismiss={() => setShowModal(false)}
             breakpoints={[0, 0.8]}
@@ -341,9 +342,9 @@ import {
                 </IonButton>
               </form>
             </IonContent>
-          </IonModal>
+          </AccessibleModal>
   
-          <IonLoading isOpen={loading} message="Cargando..." />
+          <LoadingOverlay isOpen={loading} message="Cargando..." />
           <IonToast
             isOpen={showToast}
             onDidDismiss={() => setShowToast(false)}

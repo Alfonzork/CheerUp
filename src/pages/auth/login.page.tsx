@@ -4,7 +4,6 @@ import {
   IonPage,
   IonInput,
   IonButton,
-  IonLoading,
   IonToast,
   IonCard,
   IonCardHeader,
@@ -18,6 +17,7 @@ import {
 import { useHistory } from 'react-router-dom';
 import './login.page.css';
 import { supabase } from '../../services/supabase.service';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 const Login: React.FC = () => {
   const [run, setRun] = useState('');
@@ -143,7 +143,7 @@ const Login: React.FC = () => {
           </IonRow>
         </IonGrid>
 
-        <IonLoading isOpen={loading} message="Iniciando sesión..." />
+        <LoadingOverlay isOpen={loading} message="Iniciando sesión..." />
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}

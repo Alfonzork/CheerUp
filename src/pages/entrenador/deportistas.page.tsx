@@ -14,7 +14,6 @@ import {
     IonModal,
     IonInput,
     IonButtons,
-    IonLoading,
     IonToast,
     IonSearchbar,
     IonAlert
@@ -25,6 +24,8 @@ import {
   import { subscribeToChanges } from '../../services/changes.service';
   import { Equipo } from '../../models/supabase.model';
   import { useHistory } from 'react-router-dom';
+  import LoadingOverlay from '../../components/LoadingOverlay';
+  import AccessibleModal from '../../components/AccessibleModal';
   
   const Deportistas: React.FC = () => {
     const [deportistas, setDeportistas] = useState<any[]>([]);
@@ -218,12 +219,12 @@ import {
           </IonList>
   
           <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton onClick={abrirModalCrear}>
+            <IonFabButton onClick={abrirModalCrear} color="warning">
               <IonIcon icon={add} />
             </IonFabButton>
           </IonFab>
   
-          <IonModal 
+          <AccessibleModal
             isOpen={showModal} 
             onDidDismiss={() => setShowModal(false)}
             breakpoints={[0, 0.8]}
@@ -290,7 +291,7 @@ import {
                 </IonButton>
               </form>
             </IonContent>
-          </IonModal>
+          </AccessibleModal>
   
           <IonAlert
             isOpen={showDeleteAlert}
@@ -313,7 +314,7 @@ import {
             ]}
           />
   
-          <IonLoading isOpen={loading} message="Cargando..." />
+          <LoadingOverlay isOpen={loading} message="Cargando..." />
           <IonToast
             isOpen={showToast}
             onDidDismiss={() => setShowToast(false)}

@@ -16,7 +16,6 @@ import {
     IonSelect,
     IonSelectOption,
     IonButtons,
-    IonLoading,
     IonToast,
     IonDatetime,
     IonChip,
@@ -35,6 +34,8 @@ import {
   import interactionPlugin from '@fullcalendar/interaction';
   import esLocale from '@fullcalendar/core/locales/es';
   import './calendario.compacto.css';
+  import LoadingOverlay from '../../components/LoadingOverlay';
+  import AccessibleModal from '../../components/AccessibleModal';
   
   const Calendario: React.FC = () => {
     const [eventos, setEventos] = useState<Evento[]>([]);
@@ -261,12 +262,12 @@ import {
           </IonList>
   
           <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton onClick={abrirModalCrear}>
+            <IonFabButton onClick={abrirModalCrear} color="warning">
               <IonIcon icon={add} />
             </IonFabButton>
           </IonFab>
   
-          <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
+          <AccessibleModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
             <IonHeader>
               <IonToolbar>
                 <IonTitle>{eventoEditar ? 'Editar Evento' : 'Nuevo Evento'}</IonTitle>
@@ -319,9 +320,9 @@ import {
                 </IonButton>
               </form>
             </IonContent>
-          </IonModal>
+          </AccessibleModal>
   
-          <IonLoading isOpen={loading} message="Cargando..." />
+          <LoadingOverlay isOpen={loading} message="Cargando..." />
           <IonToast
             isOpen={showToast}
             onDidDismiss={() => setShowToast(false)}

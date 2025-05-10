@@ -11,11 +11,9 @@ import {
     IonIcon,
     IonFab,
     IonFabButton,
-    IonModal,
     IonSelect,
     IonSelectOption,
     IonButtons,
-    IonLoading,
     IonToast,
     IonSearchbar,
     IonBackButton,
@@ -28,6 +26,8 @@ import {
   import { deportistaService } from '../../services/deportistas.service';
   import { equipoService } from '../../services/equipos.service';
   import { equipoMiembrosService } from '../../services/eqmiembros.service';
+  import LoadingOverlay from '../../components/LoadingOverlay';
+  import AccessibleModal from '../../components/AccessibleModal';
   
   const EquipoDeportistas: React.FC = () => {
     const { equipoId } = useParams<{ equipoId: string }>();
@@ -193,12 +193,12 @@ import {
           </IonList>
   
           <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton onClick={() => setShowModal(true)}>
+            <IonFabButton onClick={() => setShowModal(true)} color="warning">
               <IonIcon icon={add} />
             </IonFabButton>
           </IonFab>
   
-          <IonModal 
+          <AccessibleModal
             isOpen={showModal} 
             onDidDismiss={() => {
               setShowModal(false);
@@ -253,9 +253,9 @@ import {
                 )}
               </IonList>
             </IonContent>
-          </IonModal>
+          </AccessibleModal>
   
-          <IonLoading isOpen={loading} message="Cargando..." />
+          <LoadingOverlay isOpen={loading} message="Cargando..." />
           <IonToast
             isOpen={showToast}
             onDidDismiss={() => setShowToast(false)}

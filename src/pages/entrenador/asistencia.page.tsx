@@ -16,7 +16,6 @@ import {
     IonSelect,
     IonSelectOption,
     IonButtons,
-    IonLoading,
     IonToast,
     IonDatetime,
     IonChip,
@@ -31,6 +30,8 @@ import {
   import { equipoService } from '../../services/equipos.service';
   import { AuthService } from '../../services/auth.service';
   import { useHistory } from 'react-router-dom';
+  import LoadingOverlay from '../../components/LoadingOverlay';
+  import AccessibleModal from '../../components/AccessibleModal';
   
   const Asistencias: React.FC = () => {
     const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
@@ -220,12 +221,12 @@ import {
           </IonList>
   
           <IonFab vertical="bottom" horizontal="end" slot="fixed">
-            <IonFabButton onClick={abrirModalCrear}>
+            <IonFabButton onClick={abrirModalCrear} color="warning">
               <IonIcon icon={add} />
             </IonFabButton>
           </IonFab>
   
-          <IonModal 
+          <AccessibleModal 
             isOpen={showModal} 
             onDidDismiss={() => setShowModal(false)}
             breakpoints={[0, 1]}
@@ -278,9 +279,9 @@ import {
                 </IonButton>
               </form>
             </IonContent>
-          </IonModal>
+          </AccessibleModal>
   
-          <IonLoading isOpen={loading} message="Cargando..." />
+          <LoadingOverlay isOpen={loading} message="Cargando..." />
           <IonToast
             isOpen={showToast}
             onDidDismiss={() => setShowToast(false)}

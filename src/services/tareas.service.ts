@@ -8,7 +8,7 @@ export const tareaService = {
       return data;
     },
   
-    async getByEquipo(equipoId: number) {
+    async getByEquipo(equipoId: string) {
       const { data, error } = await supabase
         .from('tareas')
         .select('*')
@@ -17,19 +17,19 @@ export const tareaService = {
       return data as Tarea[];
     },
   
-    async create(tarea: Omit<Tarea, 'id' | 'created_at'>): Promise<Tarea> {
+    async create(tarea: Omit<Tarea, 'id' | 'created_at'> & { entrenador_id: string }): Promise<Tarea> {
       const { data, error } = await supabase.from('tareas').insert(tarea).select().single();
       if (error) throw error;
       return data;
     },
   
-    async update(id: number, tarea: Partial<Tarea>): Promise<Tarea> {
+    async update(id: string, tarea: Partial<Tarea> & { entrenador_id?: string }): Promise<Tarea> {
       const { data, error } = await supabase.from('tareas').update(tarea).eq('id', id).select().single();
       if (error) throw error;
       return data;
     },
   
-    async delete(id: number): Promise<void> {
+    async delete(id: string): Promise<void> {
       const { error } = await supabase.from('tareas').delete().eq('id', id);
       if (error) throw error;
     }

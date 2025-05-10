@@ -12,13 +12,13 @@ import {
   IonSelectOption,
   IonTextarea,
   IonButton,
-  IonLoading,
   IonToast,
-  IonChip,
-  IonModal
+  IonChip
 } from '@ionic/react';
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { asistenciaService } from '../../services/asistencia.service';
+import LoadingOverlay from '../../components/LoadingOverlay';
+import AccessibleModal from '../../components/AccessibleModal';
 
 const estados = [
   { value: 'presente', label: 'Presente' },
@@ -138,7 +138,7 @@ const AsistenciaCheckPage: React.FC = () => {
             </IonItem>
           ))}
         </IonList>
-        <IonModal isOpen={showEditModal} onDidDismiss={closeEditModal}>
+        <AccessibleModal isOpen={showEditModal} onDidDismiss={closeEditModal}>
           <IonHeader>
             <IonToolbar>
               <IonTitle>Editar Asistencia</IonTitle>
@@ -169,8 +169,8 @@ const AsistenciaCheckPage: React.FC = () => {
               </>
             )}
           </IonContent>
-        </IonModal>
-        <IonLoading isOpen={loading} message="Cargando..." />
+        </AccessibleModal>
+        <LoadingOverlay isOpen={loading} message="Cargando..." />
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
