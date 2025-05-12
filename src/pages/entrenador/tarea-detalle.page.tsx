@@ -24,7 +24,7 @@ import LoadingOverlay from '../../components/LoadingOverlay';
 interface DeportistaTarea {
   id: string;
   deportista: string;
-  estado: 'pendiente' | 'en_progreso' | 'completada';
+  estado: number;
   fecha_asignacion: string;
 }
 
@@ -59,32 +59,6 @@ const TareaDetalle: React.FC = () => {
     }
   };
 
-  const getEstadoColor = (estado: string) => {
-    switch (estado) {
-      case 'pendiente':
-        return 'warning';
-      case 'en_progreso':
-        return 'primary';
-      case 'completada':
-        return 'success';
-      default:
-        return 'medium';
-    }
-  };
-
-  const getEstadoTexto = (estado: string) => {
-    switch (estado) {
-      case 'pendiente':
-        return 'Pendiente';
-      case 'en_progreso':
-        return 'En Progreso';
-      case 'completada':
-        return 'Completada';
-      default:
-        return estado;
-    }
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -101,8 +75,8 @@ const TareaDetalle: React.FC = () => {
             <h3>{tarea.titulo}</h3>
             <p className="descripcion">{tarea.descripcion}</p>
             <div className="meta-info">
-              <IonChip color={getEstadoColor(tarea.estado)}>
-                {getEstadoTexto(tarea.estado)}
+              <IonChip color={tareaService.getEstadoColor(tarea.estado)}>
+                {tareaService.getEstadoTexto(tarea.estado)}
               </IonChip>
               <p>
                 <IonIcon icon={time} /> Fecha límite: {new Date(tarea.fecha_vencimiento).toLocaleDateString()}
@@ -119,8 +93,8 @@ const TareaDetalle: React.FC = () => {
               <IonLabel>
                 <h2>{deportista.deportista}</h2>
                 <p>
-                  <IonChip color={getEstadoColor(deportista.estado)}>
-                    {getEstadoTexto(deportista.estado)}
+                  <IonChip color={tareaService.getEstadoColor(deportista.estado)}>
+                    {tareaService.getEstadoTexto(deportista.estado)}
                   </IonChip>
                 </p>
                 <p>Asignado: {new Date(deportista.fecha_asignacion).toLocaleDateString()}</p>

@@ -48,7 +48,7 @@ const Tareas: React.FC = () => {
     titulo: '',
     descripcion: '',
     fecha_vencimiento: '',
-    estado: 'pendiente' as 'pendiente' | 'en_progreso' | 'completada',
+    estado: 1,
     equipo_id: ''
   });
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
@@ -155,7 +155,7 @@ const Tareas: React.FC = () => {
       titulo: tarea.titulo,
       descripcion: tarea.descripcion || '',
       fecha_vencimiento: tarea.fecha_vencimiento,
-      estado: tarea.estado as 'pendiente' | 'en_progreso' | 'completada',
+      estado: tarea.estado,
       equipo_id: tarea.equipo_id.toString()
     });
     setShowModal(true);
@@ -167,32 +167,32 @@ const Tareas: React.FC = () => {
       titulo: '',
       descripcion: '',
       fecha_vencimiento: '',
-      estado: 'pendiente',
+      estado: 1,
       equipo_id: ''
     });
     setShowModal(true);
   };
 
-  const getEstadoColor = (estado: string) => {
+  const getEstadoColor = (estado: number) => {
     switch (estado) {
-      case 'pendiente':
+      case 1:
         return 'warning';
-      case 'en_progreso':
+      case 2:
         return 'primary';
-      case 'completada':
+      case 3:
         return 'success';
       default:
         return 'medium';
     }
   };
 
-  const getEstadoTexto = (estado: string) => {
+  const getEstadoTexto = (estado: number) => {
     switch (estado) {
-      case 'pendiente':
+      case 1:
         return 'Pendiente';
-      case 'en_progreso':
+      case 2:
         return 'En Progreso';
-      case 'completada':
+      case 3:
         return 'Completada';
       default:
         return estado;
@@ -331,7 +331,7 @@ const Tareas: React.FC = () => {
                 label="Estado"
                 labelPlacement="floating"
                 value={formData.estado}
-                onIonChange={e => setFormData({...formData, estado: e.detail.value as 'pendiente' | 'en_progreso' | 'completada'})}
+                onIonChange={e => setFormData({...formData, estado: e.detail.value})}
                 required
                 interface="action-sheet"
                 className="custom-select"

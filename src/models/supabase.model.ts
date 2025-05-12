@@ -25,14 +25,20 @@ export type Deportista = {
   
   export interface Tarea {
     id: string;
+    tarea_id: string;
+    deportista: string;
     equipo_id: string;
     entrenador_id: string;
     titulo: string;
     descripcion: string;
     fecha_vencimiento: string;
-    estado: 'pendiente' | 'en_progreso' | 'completada';
+    estado: number;
     updated_at: string;
     created_at: string;
+    fecha_asignacion: string;
+    deportista_id: string;
+    estado_nombre: string;
+    idx: number;
   }
   
   export interface Asistencia {

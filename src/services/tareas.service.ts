@@ -55,7 +55,7 @@ export const tareaService = {
       if (error) throw error;
     },
 
-    async crear_tarea(titulo: string,descripcion: string, equipo_id: string, entrenador_id: string, fecha_vencimiento: string, estado: string): Promise<void> {
+    async crear_tarea(titulo: string,descripcion: string, equipo_id: string, entrenador_id: string, fecha_vencimiento: string, estado: number): Promise<void> {
       const { error } = await supabase.rpc('crear_tarea',{
         tit: titulo,
         decrip: descripcion,
@@ -88,14 +88,11 @@ export const tareaService = {
       const user = AuthService.getCurrentUser();
       if (!user) throw new Error('Usuario no autenticado');
 
-      const { data, error } = await supabase
-        .from('tareas_deportistas')
-        .select('*')
-        .eq('deportista_id', user.id);
+      const { data, error } = await supabase.from('view_tarea_deportistas').select('*').eq('deportista_id', user.id);
 
       if (error) throw error;
 
-      return data.map(item => item.tareas);
+      return data;
     },
 
     async getTareasPendientesDeportista(): Promise<Tarea[]> {
@@ -103,7 +100,7 @@ export const tareaService = {
       if (!user) throw new Error('Usuario no autenticado');
 
       const { data, error } = await supabase
-        .from('tareas_deportistas')
+        .from('view_tarea_deportistas')
         .select('*')
         .eq('deportista_id', user.id)
         .eq('estado', 'pendiente');
@@ -111,5 +108,45 @@ export const tareaService = {
       if (error) throw error;
 
       return data;
+    },
+
+    async marcarTareaCompletada(id: number): Promise<void> {
+      try {
+        const { error } = await supabase
+          .from('tarea_deportista')
+          .update({ estado: 3})
+          .eq('id', id);
+
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error al marcar tarea como completada:', error);
+        throw error;
+      }
+    },
+
+  getEstadoColor(estado: number) {
+    switch (estado) {
+      case 1:
+        return 'warning';
+      case 2:
+        return 'primary';
+      case 3:
+        return 'success';
+      default:
+        return 'medium';
     }
+  },
+
+  getEstadoTexto(estado: number) {
+    switch (estado) {
+      case 1:
+        return 'Pendiente';
+      case 2:
+        return 'En Progreso';
+      case 3:
+        return 'Completada';
+      default:
+        return estado;
+    }
+  },
 };

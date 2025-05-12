@@ -9,13 +9,17 @@ import {
   IonLabel,
   IonChip,
   IonIcon,
-  IonToast
+  IonToast,
+  IonBadge,
+  IonButton,
+  IonNote
 } from '@ionic/react';
-import { time } from 'ionicons/icons';
+import { time, checkmarkCircleOutline, timeOutline } from 'ionicons/icons';
 import React, { useEffect, useState } from 'react';
 import { tareaService } from '../../services/tareas.service';
 import { Tarea } from '../../models/supabase.model';
 import LoadingOverlay from '../../components/LoadingOverlay';
+import AppHeader from '../../components/AppHeader';
 
 const DeportistaTareasPage: React.FC = () => {
   const [tareas, setTareas] = useState<Tarea[]>([]);
@@ -41,55 +45,89 @@ const DeportistaTareasPage: React.FC = () => {
     }
   };
 
-  const getEstadoColor = (estado: string) => {
+  const handleMarcarCompletada = async (id: number) => {
+    try {
+      setLoading(true);
+      await tareaService.marcarTareaCompletada(id);
+      setToastMessage('Tarea marcada como completada');
+      setShowToast(true);
+      // Recargar las tareas después de marcar como completada
+      await cargarTareas();
+    } catch (error) {
+      console.error('Error al marcar tarea como completada:', error);
+      setToastMessage('Error al marcar la tarea como completada');
+      setShowToast(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getEstadoColor = (estado: number) => {
     switch (estado) {
-      case 'pendiente':
+      case 1:
         return 'warning';
-      case 'en_progreso':
-        return 'primary';
-      case 'completada':
+      case 3:
         return 'success';
       default:
         return 'medium';
     }
   };
 
-  const getEstadoTexto = (estado: string) => {
+  const getEstadoTexto = (estado: number) => {
     switch (estado) {
-      case 'pendiente':
+      case 1:
         return 'Pendiente';
-      case 'en_progreso':
+      case 2:
         return 'En Progreso';
-      case 'completada':
+      case 3:
         return 'Completada';
       default:
         return estado;
     }
   };
 
+  const getEstadoIcono = (estado: number) => {
+    switch (estado) {
+      case 1:
+        return timeOutline;
+      case 3:
+        return checkmarkCircleOutline;
+      default:
+        return timeOutline;
+    }
+  };
+
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Mis Tareas</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      <AppHeader title="Mis Tareas" />
       <IonContent className="ion-padding">
         <IonList>
           {tareas.map((tarea) => (
-            <IonItem key={tarea.id}>
+            <IonItem key={tarea.idx}>
               <IonLabel>
                 <h2>{tarea.titulo}</h2>
+                <p>{tarea.descripcion}</p>
                 <p>
                   <IonChip color={getEstadoColor(tarea.estado)}>
                     {getEstadoTexto(tarea.estado)}
                   </IonChip>
                 </p>
-                <p>{tarea.descripcion}</p>
                 <p>
-                  <IonIcon icon={time} /> {new Date(tarea.fecha_vencimiento).toLocaleDateString()}
+                  <IonIcon icon={time} /> Asignado: {new Date(tarea.fecha_asignacion).toLocaleDateString()}
+                </p>
+                <p>
+                  <IonIcon icon={time} /> Vencimiento: {new Date(tarea.fecha_vencimiento).toLocaleDateString()}
                 </p>
               </IonLabel>
+              {tarea.estado_nombre.toLowerCase() === 'pendiente' && (
+                <IonButton
+                  fill="clear"
+                  slot="end"
+                  onClick={() => handleMarcarCompletada(tarea.idx)}
+                >
+                  <IonIcon icon={checkmarkCircleOutline} style={{ fontSize: '24px' }} />
+                </IonButton>
+              )}
             </IonItem>
           ))}
         </IonList>
@@ -99,7 +137,7 @@ const DeportistaTareasPage: React.FC = () => {
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
           message={toastMessage}
-          duration={2000}
+          duration={3000}
         />
       </IonContent>
     </IonPage>

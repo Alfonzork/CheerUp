@@ -20,6 +20,7 @@ import { useHistory } from 'react-router-dom';
 import { Equipo } from '../../models/supabase.model';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import { SUPABASE_STORAGE_URL } from '../../services/supabase.service';
+import AppHeader from '../../components/AppHeader';
 
 const DeportistaEquiposPage: React.FC = () => {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
@@ -59,11 +60,7 @@ const DeportistaEquiposPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Mis Equipos</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+     <AppHeader title="Mis Equipos" />
       <IonContent className="ion-padding">
         <IonList>
           {equipos.map((equipo) => (

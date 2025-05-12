@@ -32,7 +32,7 @@ import DeportistaEquiposPage from '../pages/deportista/equipos.page';
 import DeportistaTareasPage from '../pages/deportista/tareas.page';
 import DeportistaAsistenciaPage from '../pages/deportista/asistencia.page';
 import EquipoDeportistaPage from '../pages/deportista/equipoDeportista.page';
-//import DeportistaPerfilPage from '../pages/deportista/perfil.page';
+import DeportistaPerfilPage from '../pages/deportista/perfil.page';
 
 const DeportistaLayout: React.FC = () => {
   const history = useHistory();
@@ -75,7 +75,7 @@ const DeportistaLayout: React.FC = () => {
         <Route exact path="/deportista/tareas" component={DeportistaTareasPage} />
         <Route exact path="/deportista/asistencia" component={DeportistaAsistenciaPage} />
         <Route exact path="/deportista/equipos/:equipoId/deportistas" component={EquipoDeportistaPage} />
-        {/*<Route exact path="/deportista/perfil" component={DeportistaPerfilPage} />*/}
+        <Route exact path="/deportista/perfil" component={DeportistaPerfilPage} />
         <Route exact path="/deportista">
           <Redirect to="/deportista/dashboard" />
         </Route>

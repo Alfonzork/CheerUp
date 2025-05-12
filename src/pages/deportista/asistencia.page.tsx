@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { asistenciaService } from '../../services/asistencia.service';
 import { Asistencia } from '../../models/supabase.model';
 import LoadingOverlay from '../../components/LoadingOverlay';
+import AppHeader from '../../components/AppHeader';
 
 const DeportistaAsistenciaPage: React.FC = () => {
   const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
@@ -82,11 +83,7 @@ const DeportistaAsistenciaPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Mi Asistencia</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      <AppHeader title="Mi Asistencia" />
       <IonContent className="ion-padding">
         <IonList>
           {asistencias.map((asistencia, index) => (
