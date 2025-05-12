@@ -20,6 +20,7 @@ export type Deportista = {
     activo: boolean;
     created_at: string;
     updated_at: string;
+    equipo_id: string;
   }
   
   export interface Tarea {
@@ -35,15 +36,17 @@ export type Deportista = {
   }
   
   export interface Asistencia {
-    id: number;
+    id: string;
+    fecha: string;
+    descripcion: string;
+    estado: 'presente' | 'ausente' | 'justificado';
+    observacion?: string;
     deportista_id: string;
+    deportista: string;
+    aglobal_id: string;
+    nombre: string;
     equipo_id: string;
     entrenador_id: string;
-    fecha: string;
-    estado: 'presente' | 'ausente' | 'justificado';
-    observaciones: string;
-    created_at: string;
-    nombre: string;
     entrenador: string;
   }
   

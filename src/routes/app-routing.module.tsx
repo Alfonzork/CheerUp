@@ -7,6 +7,7 @@ import EntrenadorLayout from '../layouts/EntrenadorLayout';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
+import DeportistaLayout from '../layouts/DeportistaLayout';
 
 const AppRoutes: React.FC = () => {
   useEffect(() => {
@@ -46,9 +47,7 @@ const AppRoutes: React.FC = () => {
           {/* Rutas del Entrenador */}
           <Route path="/entrenador" component={EntrenadorLayout} />
 
-          <Route exact path="/deportista">
-            <div>Página de Deportista</div>
-          </Route>
+          <Route path="/deportista" component={DeportistaLayout} />
           
           <Route exact path="/">
             <Redirect to="/login" />

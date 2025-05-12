@@ -1,5 +1,6 @@
 import { supabase } from './supabase.service';
 import { Asistencia } from '../models/supabase.model';
+import { AuthService } from './auth.service';
 
 // Servicios para Asistencias
 export const asistenciaService = {
@@ -50,5 +51,16 @@ export const asistenciaService = {
     async updAsistenciaDep(id: number, estado: string, observacion: string): Promise<void> {
       const { error } = await supabase.from('asistencias').update({ estado: estado, observacion: observacion }).eq('id', id).select().single();
       if (error) throw error;
+    },
+
+    async getAsistenciasDeportista(): Promise<Asistencia[]> {
+      const user = AuthService.getCurrentUser();
+      if (!user) throw new Error('Usuario no autenticado');
+
+      const { data, error } = await supabase.from('asis_deportistas').select('*').eq('deportista_id', user.id).order('fecha', { ascending: false });
+
+      if (error) throw error;
+
+      return data
     }
   };

@@ -54,7 +54,8 @@ import {
       image: '',
       entrenador_id: 0,
       activo: true,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      equipo_id: ''
     });
     const [showDeleteAlert, setShowDeleteAlert] = useState(false);
     const [equipoToDelete, setEquipoToDelete] = useState<number | null>(null);
@@ -149,7 +150,8 @@ import {
         image: equipo.image,
         entrenador_id: equipo.entrenador_id,
         activo: equipo.activo,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        equipo_id: equipo.id.toString()
       });
       setShowModal(true);
     };
@@ -162,7 +164,8 @@ import {
         image: '',
         entrenador_id: 0,
         activo: true,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        equipo_id: ''
       });
       setShowModal(true);
     };

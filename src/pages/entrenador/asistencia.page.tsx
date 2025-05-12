@@ -127,7 +127,7 @@ import {
         deportista_id: asistencia.deportista_id.toString(),
         entrenador_id: asistencia.entrenador_id.toString(),
         estado: asistencia.estado as 'presente' | 'ausente' | 'justificado',
-        observaciones: asistencia.observaciones || '',
+        observaciones: asistencia.observacion || '',
         nombre: asistencia.nombre || '',
         entrenador: asistencia.entrenador || ''
       });

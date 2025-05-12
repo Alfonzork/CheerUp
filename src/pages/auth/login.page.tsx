@@ -19,6 +19,13 @@ import './login.page.css';
 import { supabase } from '../../services/supabase.service';
 import LoadingOverlay from '../../components/LoadingOverlay';
 
+interface User {
+  id: string;
+  run: string;
+  password: string;
+  tipo_usuario: 'admin' | 'entrenador' | 'deportista';
+}
+
 const Login: React.FC = () => {
   const [run, setRun] = useState('');
   const [password, setPassword] = useState('');
@@ -45,6 +52,13 @@ const Login: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!run || !password) {
+      setToastMessage('Por favor, ingrese R.U.N. y contraseña');
+      setShowToast(true);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -53,37 +67,38 @@ const Login: React.FC = () => {
         .select('*')
         .eq('run', run)
         .eq('password', password)
-        .single();
+        .maybeSingle() as { data: User | null, error: any };
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          setToastMessage('Credenciales inválidas. Por favor, verifica tu R.U.N. y contraseña.');
-        } else {
-          setToastMessage('Error al iniciar sesión. Por favor, intenta nuevamente.');
-        }
+        console.error('Error en la consulta:', error);
+        setToastMessage('Error al iniciar sesión. Por favor, intenta nuevamente.');
         setShowToast(true);
         return;
       }
 
-      if (data) {
-        // Guardar datos del usuario en localStorage
-        localStorage.setItem('user', JSON.stringify(data));
-        
-        // Redirigir según el rol
-        switch (data.tipo_usuario) {
-          case 'admin':
-            history.push('/admin/dashboard');
-            break;
-          case 'entrenador':
-            history.replace('/entrenador/dashboard');
-            break;
-          case 'deportista':
-            history.push('/deportista/dashboard');
-            break;
-          default:
-            setToastMessage('Tipo de usuario no válido');
-            setShowToast(true);
-        }
+      if (!data) {
+        setToastMessage('Usuario no encontrado y/o contraseña incorrecta');
+        setShowToast(true);
+        return;
+      }
+
+      // Si llegamos aquí, el login es exitoso
+      localStorage.setItem('user', JSON.stringify(data));
+      
+      // Redirigir según el rol
+      switch (data.tipo_usuario) {
+        case 'admin':
+          history.push('/admin/dashboard');
+          break;
+        case 'entrenador':
+          history.replace('/entrenador/dashboard');
+          break;
+        case 'deportista':
+          history.push('/deportista/dashboard');
+          break;
+        default:
+          setToastMessage('Tipo de usuario no válido');
+          setShowToast(true);
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
@@ -125,13 +140,19 @@ const Login: React.FC = () => {
                     />
                     <IonInput
                       type="password"
-                      label="Contraseña"
+                      label="PIN"
                       labelPlacement="floating"
                       value={password}
-                      onIonChange={e => setPassword(e.detail.value!)}
+                      onIonInput={e => {
+                        const value = e.detail.value || '';
+                        if (value.length <= 4 && /^\d*$/.test(value)) {
+                          setPassword(value);
+                        }
+                      }}
+                      maxlength={4}
                       required
                       className="ion-margin-bottom"
-                      placeholder="Ingrese su contraseña"
+                      placeholder="Ingrese su PIN de 4 dígitos"
                     />
                     <IonButton expand="block" type="submit" className="ion-margin-top">
                       Ingresar

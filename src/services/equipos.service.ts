@@ -1,5 +1,6 @@
 import { supabase } from './supabase.service';
 import { Equipo } from '../models/supabase.model';
+import { AuthService } from './auth.service';
 
 // Servicios para Equipos
 export const equipoService = {
@@ -37,5 +38,16 @@ export const equipoService = {
         .update({ activo: false })
         .eq('id', id);
       if (error) throw error;
+    },
+  
+    async getEquiposDeportista(): Promise<Equipo[]> {
+      const user = AuthService.getCurrentUser();
+      if (!user) throw new Error('Usuario no autenticado');
+  
+      const { data, error } = await supabase.from('mis_equipos').select('*').eq('id', user.id);
+      console.log('Datos de equipos:', data);
+      if (error) throw error;
+  
+      return data;
     }
   };
