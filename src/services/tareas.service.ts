@@ -81,7 +81,7 @@ export const tareaService = {
     },
 
     async getDeportistasByTarea(tareaId: string) {
-      const { data, error } = await supabase.from('view_tarea_deportistas').select('*').eq('tarea_id', tareaId);
+      const { data, error } = await supabase.from('view_tarea_deportistas').select('*').eq('tarea_id', tareaId).order('estado', {ascending: true}).order('deportista', {ascending: true} );
       if (error) throw error;
       return data;
     },
@@ -134,6 +134,8 @@ export const tareaService = {
         return 'primary';
       case 3:
         return 'success';
+      case 4:
+        return 'success';  
       default:
         return 'medium';
     }
@@ -147,6 +149,8 @@ export const tareaService = {
         return 'En Progreso';
       case 3:
         return 'Completado';
+      case 4:
+        return 'Evaluado';
       default:
         return estado;
     }
@@ -158,8 +162,16 @@ export const tareaService = {
         return timeOutline;
       case 3:
         return checkmarkCircleOutline;
+      case 4:
+        return checkmarkCircleOutline;
       default:
         return timeOutline;
     }
   },
+
+  guardarEvaluacion: async (id: number, nota: number, observacion: string, entrenador_id: string) => {
+    const { error } = await supabase.from('tarea_deportista').update({ nota: nota, observacion: observacion, entrenador_id: entrenador_id, estado:4 }).eq('id', id);
+
+    if (error) throw error;
+  }
 };
