@@ -28,6 +28,7 @@ import {
   import { equipoMiembrosService } from '../../services/eqmiembros.service';
   import LoadingOverlay from '../../components/LoadingOverlay';
   import AccessibleModal from '../../components/AccessibleModal';
+  import BackButton from '../../components/BackButton';
   
   const EquipoDeportistas: React.FC = () => {
     const { equipoId } = useParams<{ equipoId: string }>();
@@ -156,10 +157,7 @@ import {
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonButton onClick={handleVolver}>
-                <IonIcon slot="start" icon={arrowBack} />
-                Volver
-              </IonButton>
+              <BackButton />
             </IonButtons>
             <IonTitle>{equipo?.nombre || 'Equipo'} ({deportistasFiltrados.length})</IonTitle>
           </IonToolbar>

@@ -36,6 +36,7 @@ const DeportistaTareasPage: React.FC = () => {
       setLoading(true);
       const tareasData = await tareaService.getTareasDeportista();
       setTareas(tareasData);
+
     } catch (error) {
       console.error('Error al cargar tareas:', error);
       setToastMessage('Error al cargar las tareas');
@@ -62,41 +63,6 @@ const DeportistaTareasPage: React.FC = () => {
     }
   };
 
-  const getEstadoColor = (estado: number) => {
-    switch (estado) {
-      case 1:
-        return 'warning';
-      case 3:
-        return 'success';
-      default:
-        return 'medium';
-    }
-  };
-
-  const getEstadoTexto = (estado: number) => {
-    switch (estado) {
-      case 1:
-        return 'Pendiente';
-      case 2:
-        return 'En Progreso';
-      case 3:
-        return 'Completada';
-      default:
-        return estado;
-    }
-  };
-
-  const getEstadoIcono = (estado: number) => {
-    switch (estado) {
-      case 1:
-        return timeOutline;
-      case 3:
-        return checkmarkCircleOutline;
-      default:
-        return timeOutline;
-    }
-  };
-
   return (
     <IonPage>
       <AppHeader title="Mis Tareas" />
@@ -108,8 +74,8 @@ const DeportistaTareasPage: React.FC = () => {
                 <h2>{tarea.titulo}</h2>
                 <p>{tarea.descripcion}</p>
                 <p>
-                  <IonChip color={getEstadoColor(tarea.estado)}>
-                    {getEstadoTexto(tarea.estado)}
+                  <IonChip color={tareaService.getEstadoColor(tarea.estado)}>
+                    {tareaService.getEstadoTexto(tarea.estado)}
                   </IonChip>
                 </p>
                 <p>
@@ -125,7 +91,7 @@ const DeportistaTareasPage: React.FC = () => {
                   slot="end"
                   onClick={() => handleMarcarCompletada(tarea.idx)}
                 >
-                  <IonIcon icon={checkmarkCircleOutline} style={{ fontSize: '24px' }} />
+                  <IonIcon icon={checkmarkCircleOutline} style={{ fontSize: '24px' }}  color="success"/>
                 </IonButton>
               )}
             </IonItem>

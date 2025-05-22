@@ -62,12 +62,13 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('run', run)
-        .eq('password', password)
-        .maybeSingle() as { data: User | null, error: any };
+      let { data, error } = await supabase.rpc('user_validation',{
+        run_u: run,
+        pass: password
+      });
+
+      data = data?.[0] ?? null;
+      console.log('Error de Supabase:', data.tipo_usuario);
 
       if (error) {
         console.error('Error en la consulta:', error);

@@ -18,7 +18,8 @@ import {
     IonSearchbar,
     IonBackButton,
     IonAlert,
-    IonListHeader
+    IonListHeader,
+    IonChip,
   } from '@ionic/react';
   import { add, person, trash, arrowBack } from 'ionicons/icons';
   import React, { useEffect, useState } from 'react';
@@ -28,6 +29,7 @@ import {
   import { equipoMiembrosService } from '../../services/eqmiembros.service';
   import LoadingOverlay from '../../components/LoadingOverlay';
   import AccessibleModal from '../../components/AccessibleModal';
+  import BackButton from '../../components/BackButton';
   
   const EquipoDeportistas: React.FC = () => {
     const { equipoId } = useParams<{ equipoId: string }>();
@@ -156,12 +158,14 @@ import {
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonButton onClick={handleVolver}>
-                <IonIcon slot="start" icon={arrowBack} />
-                Volver
-              </IonButton>
+              <BackButton />
             </IonButtons>
-            <IonTitle>{equipo?.nombre || 'Equipo'} ({deportistasFiltrados.length})</IonTitle>
+            <IonTitle>{equipo?.nombre || 'Equipo'}
+              <span></span>
+              <IonChip color={'dark'}>
+                Total Deportistas {deportistasFiltrados.length}
+              </IonChip>
+                </IonTitle>
           </IonToolbar>
           <IonToolbar>
             <IonSearchbar
@@ -186,7 +190,7 @@ import {
                   color="danger" 
                   onClick={() => handleEliminarDeportista(deportista.id)}
                 >
-                  <IonIcon icon={trash} />
+                  <IonIcon icon={trash} color='danger'/>
                 </IonButton>
               </IonItem>
             ))}

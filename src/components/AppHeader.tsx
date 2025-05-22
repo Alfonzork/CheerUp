@@ -10,10 +10,11 @@ import {
   IonIcon,
   IonMenuButton
 } from '@ionic/react';
-import { personCircle } from 'ionicons/icons';
+import { personCircle, logOutOutline } from 'ionicons/icons';
 import React, { useState, useEffect } from 'react';
 import { AuthService } from '../services/auth.service';
 import { supabase, SUPABASE_STORAGE_URL } from '../services/supabase.service';
+import { useHistory } from 'react-router-dom';
 
 interface UserData {
   nombres: string;
@@ -27,32 +28,27 @@ interface AppHeaderProps {
 
 const AppHeader: React.FC<AppHeaderProps> = ({ title = 'CheerUp' }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
+  const history = useHistory();
 
   useEffect(() => {
     cargarDatosUsuario();
   }, []);
 
-  const cargarDatosUsuario = async () => {
+  const cargarDatosUsuario = () => {
     try {
-      const user = await AuthService.getCurrentUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('users')
-        .select('nombres, ap_paterno, avatar')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      if (data.avatar) {
-        data.avatar = `${SUPABASE_STORAGE_URL}/users/${data.avatar}`;
+      const storedUserData = localStorage.getItem('user');
+      if (storedUserData) {
+        const parsedData = JSON.parse(storedUserData);
+        setUserData(parsedData);
       }
-
-      setUserData(data);
     } catch (error) {
       console.error('Error al cargar datos del usuario:', error);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    history.push('/login');
   };
 
   return (
@@ -62,20 +58,24 @@ const AppHeader: React.FC<AppHeaderProps> = ({ title = 'CheerUp' }) => {
           <IonMenuButton />
         </IonButtons>
         <IonTitle>{title}</IonTitle>
-        <IonButtons slot="end">
-          <IonItem lines="none" className="ion-no-padding">
-            <IonAvatar slot="start" style={{ width: '32px', height: '32px' }}>
-              {userData?.avatar ? (
-                <img src={userData.avatar} alt="Avatar" />
-              ) : (
-                <IonIcon icon={personCircle} style={{ fontSize: '32px' }} />
-              )}
-            </IonAvatar>
-            <IonLabel className="ion-padding-start">
-              {userData ? `${userData.nombres} ${userData.ap_paterno}` : 'Usuario'}
-            </IonLabel>
-          </IonItem>
+        <IonButtons slot="primary">
+          <IonAvatar style={{ width: '32px', height: '32px', marginLeft: 8 }}>
+            {userData?.avatar ? (
+              <img src={`${SUPABASE_STORAGE_URL}/users/${userData.avatar}`} alt="Avatar" />
+              
+            ) : (
+              <IonIcon icon={personCircle} style={{ fontSize: '32px' }} />
+            )}
+          </IonAvatar>
+          <IonLabel style={{ marginLeft: 8, fontSize: 14 }}>
+            {userData ? `${userData.nombres} ${userData.ap_paterno}` : 'Usuario'}
+          </IonLabel>
         </IonButtons>
+        <IonButtons slot="end">
+            <IonButton onClick={handleLogout}>
+              <IonIcon slot="icon-only" icon={logOutOutline} />
+            </IonButton>
+          </IonButtons>
       </IonToolbar>
     </IonHeader>
   );

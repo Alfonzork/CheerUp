@@ -37,6 +37,7 @@ import AsistenciaPage from '../pages/entrenador/asistencia.page';
 import CalendarioPage from '../pages/entrenador/calendario.page';
 import AsistenciaCheckPage from '../pages/entrenador/asistenciaCheck.page';
 import TareaDetalle from '../pages/entrenador/tarea-detalle.page';
+import EntrenadorPerfilPage from '../pages/entrenador/perfil.page';
 
 const EntrenadorLayout: React.FC = () => {
   const history = useHistory();
@@ -87,11 +88,7 @@ const EntrenadorLayout: React.FC = () => {
         <Route exact path="/entrenador/asistencia" component={AsistenciaPage} />
         <Route exact path="/entrenador/asistencia/:asistenciaId/deportistas" component={AsistenciaCheckPage} />
         <Route exact path="/entrenador/calendario" component={CalendarioPage} />
-        <Route exact path="/entrenador/perfil">
-          <div className="ion-padding">
-            <h2>Perfil del Entrenador</h2>
-          </div>
-        </Route>
+        <Route exact path="/entrenador/perfil" component={EntrenadorPerfilPage}/>
         <Route exact path="/entrenador/notificaciones">
           <div className="ion-padding">
             <h2>Notificaciones</h2>

@@ -31,6 +31,7 @@ import {
   notificationsOutline
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import AppHeader from '../../components/AppHeader';
 
 const EntrenadorDashboard: React.FC = () => {
   const history = useHistory();
@@ -42,16 +43,7 @@ const EntrenadorDashboard: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Panel de Entrenador</IonTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={handleLogout}>
-              <IonIcon slot="icon-only" icon={logOutOutline} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <AppHeader title="Dashboard" />
 
       <IonContent>
         <IonGrid>
@@ -60,11 +52,11 @@ const EntrenadorDashboard: React.FC = () => {
               <IonCard>
                 <IonCardHeader>
                   <IonCardTitle>
-                    <IonIcon icon={peopleOutline} /> Atletas
+                    <IonIcon icon={peopleOutline} /> Deportistas
                   </IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <p>Gestiona tus atletas</p>
+                  <p>Gestiona tus deportistas</p>
                   <IonButton expand="block" routerLink="/entrenador/atletas">
                     Ver Atletas
                   </IonButton>
@@ -96,7 +88,7 @@ const EntrenadorDashboard: React.FC = () => {
                   </IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <p>Visualiza el progreso de tus atletas</p>
+                  <p>Visualiza el progreso de tus deportistas</p>
                   <IonButton expand="block" routerLink="/entrenador/estadisticas">
                     Ver Estadísticas
                   </IonButton>

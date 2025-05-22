@@ -20,7 +20,8 @@ import {
     IonDatetime,
     IonChip,
     IonBadge,
-    IonTextarea
+    IonTextarea,
+    IonCheckbox
   } from '@ionic/react';
 import { alertController } from '@ionic/core';
 import { add, create, trash, checkmarkCircle, time, list } from 'ionicons/icons';
@@ -34,6 +35,9 @@ import AccessibleModal from '../../components/AccessibleModal';
 import AccessibleAlert from '../../components/AccessibleAlert';
 import { AuthService } from '../../services/auth.service';
 import { useHistory } from 'react-router-dom';
+import AppHeader from '../../components/AppHeader';
+import { formatoFecha } from '../../utils/dateHelper';
+
   
 const Tareas: React.FC = () => {
   const [tareas, setTareas] = useState<Tarea[]>([]);
@@ -49,7 +53,8 @@ const Tareas: React.FC = () => {
     descripcion: '',
     fecha_vencimiento: '',
     estado: 1,
-    equipo_id: ''
+    equipo_id: '',
+    req_eva: false
   });
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [tareaToDelete, setTareaToDelete] = useState<string | null>(null);
@@ -101,7 +106,8 @@ const Tareas: React.FC = () => {
         entrenador_id: user?.id || '',
         estado: formData.estado,
         fecha_vencimiento: formData.fecha_vencimiento,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        req_eva: formData.req_eva
       };
       
       //console.log('Datos a enviar:', tareaData);
@@ -112,12 +118,13 @@ const Tareas: React.FC = () => {
         //console.log('Tarea actualizada:', updatedTarea);
         setToastMessage('Tarea actualizada correctamente');
       } else {
-        await tareaService.crear_tarea(formData.titulo.trim(), formData.descripcion.trim(), formData.equipo_id, user?.id || '', formData.fecha_vencimiento, formData.estado);
+        await tareaService.crear_tarea(formData.titulo.trim(), formData.descripcion.trim(), formData.equipo_id, user?.id || '', formData.fecha_vencimiento, formData.estado, formData.req_eva);
         setToastMessage('Tarea creada correctamente');
       }
       setShowModal(false);
       cargarDatos();
     } catch (error) {
+      console.log(formData)
       console.error('Error al guardar tarea:', error);
       setToastMessage('Error al guardar la tarea');
     } finally {
@@ -156,7 +163,8 @@ const Tareas: React.FC = () => {
       descripcion: tarea.descripcion || '',
       fecha_vencimiento: tarea.fecha_vencimiento,
       estado: tarea.estado,
-      equipo_id: tarea.equipo_id.toString()
+      equipo_id: tarea.equipo_id.toString(),
+      req_eva: tarea.req_eva || false
     });
     setShowModal(true);
   };
@@ -168,7 +176,8 @@ const Tareas: React.FC = () => {
       descripcion: '',
       fecha_vencimiento: '',
       estado: 1,
-      equipo_id: ''
+      equipo_id: '',
+      req_eva: false
     });
     setShowModal(true);
   };
@@ -214,11 +223,7 @@ const Tareas: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Tareas</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      <AppHeader title="Tareas" />
       <IonContent className="ion-padding">
         <IonSelect
           value={filtroEquipo}
@@ -250,15 +255,15 @@ const Tareas: React.FC = () => {
               <IonLabel>
                 <h2>{tarea.titulo}</h2>
                 <p>
-                  <IonChip color={getEstadoColor(tarea.estado)}>
+                  <IonBadge color={getEstadoColor(tarea.estado)}>
                     {getEstadoTexto(tarea.estado)}
-                  </IonChip>
+                  </IonBadge>
                 </p>
               </IonLabel>
               <IonLabel>                
                 <p>{tarea.descripcion}</p>
                 <p>
-                  <IonIcon icon={time} /> {new Date(tarea.fecha_vencimiento).toLocaleDateString()}
+                  <IonIcon icon={time} /> {formatoFecha(tarea.fecha_vencimiento)}
                 </p>
                 <p>Equipo: {getEquipoNombre(tarea.equipo_id.toString())}</p>
               </IonLabel>
@@ -267,13 +272,13 @@ const Tareas: React.FC = () => {
                   e.stopPropagation();
                   abrirModalEditar(tarea);
                 }}>
-                  <IonIcon icon={create} />
+                  <IonIcon icon={create} color='primary'/>
                 </IonButton>
                 <IonButton onClick={(e) => {
                   e.stopPropagation();
                   handleDelete(tarea.id);
                 }}>
-                  <IonIcon icon={trash} />
+                  <IonIcon icon={trash} color='danger'/>
                 </IonButton>
               </IonButtons>
             </IonItem>
@@ -336,9 +341,9 @@ const Tareas: React.FC = () => {
                 interface="action-sheet"
                 className="custom-select"
               >
-                <IonSelectOption value="pendiente">Pendiente</IonSelectOption>
-                <IonSelectOption value="en_progreso">En Progreso</IonSelectOption>
-                <IonSelectOption value="completada">Completada</IonSelectOption>
+                <IonSelectOption value="1">Pendiente</IonSelectOption>
+                <IonSelectOption value="2">En Progreso</IonSelectOption>
+                <IonSelectOption value="3">Completada</IonSelectOption>
               </IonSelect>
 
               <IonSelect
@@ -356,6 +361,13 @@ const Tareas: React.FC = () => {
                   </IonSelectOption>
                 ))}
               </IonSelect>
+              <IonCheckbox 
+              checked={formData.req_eva}
+              onIonChange={e => setFormData({...formData, req_eva: e.detail.checked})}
+              justify='space-between'
+              className="custom-select"
+              >Evaluar Tarea
+              </IonCheckbox>
 
               <IonButton expand="block" type="submit" className="ion-margin-top">
                 {tareaEditar ? 'Actualizar' : 'Crear'}

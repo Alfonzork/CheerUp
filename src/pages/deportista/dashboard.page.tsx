@@ -60,7 +60,7 @@ const DeportistaDashboardPage: React.FC = () => {
                       <IonIcon icon={time} /> {new Date(tarea.fecha_vencimiento).toLocaleDateString()}
                     </p>
                     <IonChip color={tareaService.getEstadoColor(tarea.estado)}>
-                      {tarea.estado}
+                      {tareaService.getEstadoTexto(tarea.estado)}
                     </IonChip>
                   </IonLabel>
                 </IonItem>

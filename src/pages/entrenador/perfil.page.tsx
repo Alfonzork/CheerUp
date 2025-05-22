@@ -3,7 +3,7 @@ import { IonPage } from '@ionic/react';
 import AppHeader from '../../components/AppHeader';
 import PerfilUser from '../../components/PerfilUser';
 
-const DeportistaPerfilPage: React.FC = () => {
+const EntrenadorPerfilPage: React.FC = () => {
   return (
     <IonPage>
       <AppHeader title="Mi Perfil" />
@@ -12,4 +12,4 @@ const DeportistaPerfilPage: React.FC = () => {
   );
 };
 
-export default DeportistaPerfilPage; 
+export default EntrenadorPerfilPage; 

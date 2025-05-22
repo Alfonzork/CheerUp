@@ -13,12 +13,14 @@ import {
   IonTextarea,
   IonButton,
   IonToast,
-  IonChip
+  IonChip,
+  IonButtons
 } from '@ionic/react';
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { asistenciaService } from '../../services/asistencia.service';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import AccessibleModal from '../../components/AccessibleModal';
+import BackButton from '../../components/BackButton';
 
 const estados = [
   { value: 'presente', label: 'Presente' },
@@ -116,6 +118,9 @@ const AsistenciaCheckPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <BackButton />
+          </IonButtons>
           <IonTitle>
             {equipoNombre && fecha
               ? `${equipoNombre} - ${new Date(fecha).toLocaleDateString()}`

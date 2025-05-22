@@ -28,16 +28,26 @@ export const asistenciaService = {
     },
 
     async registrarAsistencia(entrenador_id: string, equipo_id: string, fecha: string): Promise<void> {
-      const { error } = await supabase.rpc('crear_asistencia',{
+      const { data, error } = await supabase.from('asistencia_global').select('*').eq('equipo_id', equipo_id).eq('fecha', fecha);
+
+      if (data && data.length > 0) {
+            throw new Error('Ya existe una asistencia con esta fecha para el equipo.');
+      } else {
+        const { error: rpcError } = await supabase.rpc('crear_asistencia',{
         ent_id: entrenador_id,
         equ_id: equipo_id,
         fecha_a: fecha
       });
-      if (error) throw error;
+
+      if (rpcError) throw rpcError;
+      }
     },
 
-    async listarAsistencias(): Promise<Asistencia[]> {
-      const { data, error } = await supabase.from('asistencia_listar').select('*');
+    async listarAsistencias(limite: number = 20): Promise<Asistencia[]> {
+      const { data, error } = await supabase
+        .from('asistencia_listar')
+        .select('*')
+        .limit(limite);
       if (error) throw error;
       return data;
     },

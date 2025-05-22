@@ -14,6 +14,8 @@ import { personCircle } from 'ionicons/icons';
 import React, { useState, useEffect } from 'react';
 import { AuthService } from '../services/auth.service';
 import { supabase, SUPABASE_STORAGE_URL } from '../services/supabase.service';
+import { useHistory } from 'react-router-dom';
+import { logOutOutline } from 'ionicons/icons';
 
 interface UserData {
   nombres: string;
@@ -23,6 +25,7 @@ interface UserData {
 
 const AppHeader: React.FC = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
+   const history = useHistory();
 
   useEffect(() => {
     cargarDatosUsuario();
@@ -51,6 +54,11 @@ const AppHeader: React.FC = () => {
     }
   };
 
+    const handleLogout = () => {
+    localStorage.removeItem('user');
+    history.push('/login');
+  };
+
   return (
     <IonHeader>
       <IonToolbar>
@@ -70,6 +78,11 @@ const AppHeader: React.FC = () => {
             <IonLabel className="ion-padding-start">
               {userData ? `${userData.nombres} ${userData.ap_paterno}` : 'Usuario'}
             </IonLabel>
+            <IonButtons slot="end">
+              <IonButton onClick={handleLogout}>
+                <IonIcon slot="icon-only" icon={logOutOutline} />
+              </IonButton>
+            </IonButtons>
           </IonItem>
         </IonButtons>
       </IonToolbar>

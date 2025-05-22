@@ -22,7 +22,11 @@ import {
   logOutOutline,
   checkmarkCircleOutline,
   clipboard,
-  calendar
+  calendar,
+  book,
+  bookOutline,
+  clipboardOutline,
+  calendarOutline
 } from 'ionicons/icons';
 import { Route, useHistory, useLocation, Redirect } from 'react-router-dom';
 import { AuthService } from '../services/auth.service';
@@ -33,6 +37,8 @@ import DeportistaTareasPage from '../pages/deportista/tareas.page';
 import DeportistaAsistenciaPage from '../pages/deportista/asistencia.page';
 import EquipoDeportistaPage from '../pages/deportista/equipoDeportista.page';
 import DeportistaPerfilPage from '../pages/deportista/perfil.page';
+import DeportistaCalendarioPage from '../pages/deportista/calendario.page';
+import DeportistaTutorialPage from '../pages/deportista/tutorial.page';
 
 const DeportistaLayout: React.FC = () => {
   const history = useHistory();
@@ -75,6 +81,8 @@ const DeportistaLayout: React.FC = () => {
         <Route exact path="/deportista/tareas" component={DeportistaTareasPage} />
         <Route exact path="/deportista/asistencia" component={DeportistaAsistenciaPage} />
         <Route exact path="/deportista/equipos/:equipoId/deportistas" component={EquipoDeportistaPage} />
+        <Route exact path="/deportista/tutorial" component={DeportistaTutorialPage} />
+        <Route exact path="/deportista/calendario" component={DeportistaCalendarioPage} />
         <Route exact path="/deportista/perfil" component={DeportistaPerfilPage} />
         <Route exact path="/deportista">
           <Redirect to="/deportista/dashboard" />
@@ -94,8 +102,16 @@ const DeportistaLayout: React.FC = () => {
           <IonLabel>Tareas</IonLabel>
         </IonTabButton>
         <IonTabButton tab="asistencia" href="/deportista/asistencia">
-          <IonIcon icon={clipboard} />
+          <IonIcon icon={clipboardOutline} />
           <IonLabel>Asistencia</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="tutorial" href="/deportista/tutorial">
+          <IonIcon icon={bookOutline} />
+          <IonLabel>Tutorial</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="calendario" href="/deportista/calendario">
+          <IonIcon icon={calendarOutline} />
+          <IonLabel>Calendario</IonLabel>
         </IonTabButton>
         <IonTabButton tab="perfil" href="/deportista/perfil">
           <IonIcon icon={personOutline} />

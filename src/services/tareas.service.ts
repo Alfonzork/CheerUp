@@ -1,10 +1,11 @@
 import { supabase } from './supabase.service';
 import { Tarea } from '../models/supabase.model';
 import { AuthService } from './auth.service';
+import { checkmarkCircleOutline, timeOutline } from 'ionicons/icons';
 
 export const tareaService = {
     async getAll(): Promise<Tarea[]> {
-      const { data, error } = await supabase.from('tareas').select('*');
+      const { data, error } = await supabase.from('tareas').select('*').order('fecha_vencimiento', { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -55,14 +56,15 @@ export const tareaService = {
       if (error) throw error;
     },
 
-    async crear_tarea(titulo: string,descripcion: string, equipo_id: string, entrenador_id: string, fecha_vencimiento: string, estado: number): Promise<void> {
+    async crear_tarea(titulo: string,descripcion: string, equipo_id: string, entrenador_id: string, fecha_vencimiento: string, estado: number, req_eva: boolean): Promise<void> {
       const { error } = await supabase.rpc('crear_tarea',{
         tit: titulo,
         decrip: descripcion,
         equ_id: equipo_id,
         ent_id: entrenador_id,
         fecha_v: fecha_vencimiento,
-        est: estado
+        est: estado,
+        req_e: req_eva
       });
       if (error) throw error;
     },
@@ -103,7 +105,7 @@ export const tareaService = {
         .from('view_tarea_deportistas')
         .select('*')
         .eq('deportista_id', user.id)
-        .eq('estado', 'pendiente');
+        .eq('estado', 1);
 
       if (error) throw error;
 
@@ -114,7 +116,7 @@ export const tareaService = {
       try {
         const { error } = await supabase
           .from('tarea_deportista')
-          .update({ estado: 3})
+          .update({ estado: 3, updated_at: new Date().toISOString()})
           .eq('id', id);
 
         if (error) throw error;
@@ -144,9 +146,20 @@ export const tareaService = {
       case 2:
         return 'En Progreso';
       case 3:
-        return 'Completada';
+        return 'Completado';
       default:
         return estado;
+    }
+  },
+
+    getEstadoIcono(estado: number) {
+    switch (estado) {
+      case 1:
+        return timeOutline;
+      case 3:
+        return checkmarkCircleOutline;
+      default:
+        return timeOutline;
     }
   },
 };

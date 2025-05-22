@@ -32,6 +32,7 @@ import {
   import { useHistory } from 'react-router';
   import LoadingOverlay from '../../components/LoadingOverlay';
   import AccessibleModal from '../../components/AccessibleModal';
+import AppHeader from '../../components/AppHeader';
   
   interface Entrenador {
     id: number;
@@ -218,11 +219,7 @@ import {
   
     return (
       <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Equipos</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <AppHeader title="Equipos"/>
         <IonContent className="ion-padding">
           {error ? (
             <div className="ion-text-center ion-padding">
@@ -256,13 +253,13 @@ import {
                         e.stopPropagation();
                         abrirModalEditar(equipo);
                       }}>
-                        <IonIcon icon={create} />
+                        <IonIcon icon={create} color='primary'/>
                       </IonButton>
                       <IonButton onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(equipo.id);
                       }}>
-                        <IonIcon icon={trash} />
+                        <IonIcon icon={trash} color='danger'/>
                       </IonButton>
                     </IonButtons>
                   </IonItem>

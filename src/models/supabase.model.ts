@@ -36,9 +36,12 @@ export type Deportista = {
     updated_at: string;
     created_at: string;
     fecha_asignacion: string;
+    fecha_realizacion: string;
+    fecha_evaluacion: string;
     deportista_id: string;
     estado_nombre: string;
     idx: number;
+    req_eva: boolean
   }
   
   export interface Asistencia {

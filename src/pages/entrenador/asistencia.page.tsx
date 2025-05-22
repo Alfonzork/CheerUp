@@ -32,6 +32,8 @@ import {
   import { useHistory } from 'react-router-dom';
   import LoadingOverlay from '../../components/LoadingOverlay';
   import AccessibleModal from '../../components/AccessibleModal';
+  import AppHeader from '../../components/AppHeader';
+  import { formatoFecha } from '../../utils/dateHelper';
   
   const Asistencias: React.FC = () => {
     const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
@@ -41,8 +43,10 @@ import {
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [toastColor, setToastColor] = useState<'success' | 'warning' | 'danger' | undefined>(undefined);
     const [asistenciaEditar, setAsistenciaEditar] = useState<Asistencia | null>(null);
     const [searchText, setSearchText] = useState('');
+    const [limiteRegistros, setLimiteRegistros] = useState(10);
     const [formData, setFormData] = useState({
       fecha: '',
       equipo_id: '',
@@ -58,7 +62,7 @@ import {
     const cargarDatos = async () => {
       try {
         const [asistenciasData, deportistasData, equiposData] = await Promise.all([
-          asistenciaService.listarAsistencias(),
+          asistenciaService.listarAsistencias(limiteRegistros),
           deportistaService.getAll(),
           equipoService.getAll()
         ]);
@@ -87,7 +91,7 @@ import {
       return () => {
         subscription.unsubscribe();
       };
-    }, []);
+    }, [limiteRegistros]);
   
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -96,10 +100,13 @@ import {
           await asistenciaService.registrarAsistencia(formData.entrenador_id, formData.equipo_id, formData.fecha);
           setToastMessage('Asistencia creada correctamente');
           setShowModal(false);
+          setToastColor('success');
+          setShowToast(true);
           cargarDatos();
-      } catch (error) {
-        console.error('Error al crear lista de asistencia:', error);
-        setToastMessage('Error al crear lista de asistencia');
+      } catch (error: any) {
+        setToastMessage(error.message || 'Error desconocido');
+        setToastColor('danger');
+        setShowToast(true);
       } finally {
         setLoading(false);
       }
@@ -150,32 +157,6 @@ import {
       setShowModal(true);
     };
   
-    const getEstadoColor = (estado: string) => {
-      switch (estado) {
-        case 'presente':
-          return 'success';
-        case 'ausente':
-          return 'danger';
-        case 'justificado':
-          return 'warning';
-        default:
-          return 'medium';
-      }
-    };
-  
-    const getEstadoTexto = (estado: string) => {
-      switch (estado) {
-        case 'presente':
-          return 'Presente';
-        case 'ausente':
-          return 'Ausente';
-        case 'justificado':
-          return 'Justificado';
-        default:
-          return estado;
-      }
-    };
-  
     const getDeportistaNombre = (deportistaId: string) => {
       const deportista = deportistas.find(d => d.id === parseInt(deportistaId));
       return deportista ? `${deportista.nombres} ${deportista.ap_paterno} ${deportista.ap_materno}` : 'Desconocido';
@@ -188,17 +169,27 @@ import {
   
     return (
       <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Asistencias</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <AppHeader title="Asistencias" />
         <IonContent className="ion-padding">
           <IonSearchbar
             value={searchText}
             onIonChange={e => setSearchText(e.detail.value!)}
             placeholder="Buscar por Asistencia..."
           />
+  
+          <IonItem>
+            <IonLabel>Límite de registros</IonLabel>
+            <IonSelect
+              value={limiteRegistros}
+              onIonChange={e => setLimiteRegistros(e.detail.value)}
+              interface="popover"
+            >
+              <IonSelectOption value={10}>10 registros</IonSelectOption>
+              <IonSelectOption value={20}>20 registros</IonSelectOption>
+              <IonSelectOption value={50}>50 registros</IonSelectOption>
+              <IonSelectOption value={100}>100 registros</IonSelectOption>
+            </IonSelect>
+          </IonItem>
   
           <IonList>
             {asistenciasFiltradas.map((asistencia) => (
@@ -209,11 +200,11 @@ import {
                 <IonLabel>
                   <h5>{asistencia.nombre}</h5>
                   <p>{asistencia.entrenador}</p>
-                  <p>Fecha: {new Date(asistencia.fecha).toLocaleDateString()}</p>
+                  <p>Fecha: {formatoFecha(asistencia.fecha)}</p>
                 </IonLabel>
                 <IonButtons slot="end">
                   <IonButton onClick={() => abrirModalEditar(asistencia)}>
-                    <IonIcon icon={create} />
+                    <IonIcon icon={create} color='primary'/>
                   </IonButton>
                 </IonButtons>
               </IonItem>
@@ -229,7 +220,7 @@ import {
           <AccessibleModal 
             isOpen={showModal} 
             onDidDismiss={() => setShowModal(false)}
-            breakpoints={[0, 1]}
+            breakpoints={[0, 0.8]}
             initialBreakpoint={0.8}
           >
             <IonHeader>
@@ -287,6 +278,7 @@ import {
             onDidDismiss={() => setShowToast(false)}
             message={toastMessage}
             duration={2000}
+            color={toastColor}
           />
         </IonContent>
       </IonPage>
