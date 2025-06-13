@@ -15,6 +15,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthService } from '../services/auth.service';
 import { supabase, SUPABASE_STORAGE_URL } from '../services/supabase.service';
 import { useHistory } from 'react-router-dom';
+import { App } from '@capacitor/app';
 
 interface UserData {
   nombres: string;
@@ -46,9 +47,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({ title = 'CheerUp' }) => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem('user');
     history.push('/login');
+      // Espera un poco o realiza animaciones si deseas
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Cerrar la app (funciona solo en dispositivos reales, no en navegador)
+    await App.exitApp();
   };
 
   return (

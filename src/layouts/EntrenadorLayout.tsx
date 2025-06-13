@@ -22,7 +22,8 @@ import {
   logOutOutline,
   checkmarkCircleOutline,
   clipboard,
-  calendar
+  calendar,
+  bookOutline
 } from 'ionicons/icons';
 import { Route, useHistory, useLocation, Redirect } from 'react-router-dom';
 import { AuthService } from '../services/auth.service';
@@ -37,7 +38,11 @@ import AsistenciaPage from '../pages/entrenador/asistencia.page';
 import CalendarioPage from '../pages/entrenador/calendario.page';
 import AsistenciaCheckPage from '../pages/entrenador/asistenciaCheck.page';
 import TareaDetalle from '../pages/entrenador/tarea-detalle.page';
+import TareaDetIndividual from '../pages/entrenador/tarea-detalle-individual.page';
 import EntrenadorPerfilPage from '../pages/entrenador/perfil.page';
+import TutorialPage from '../components/Tutorial';
+import TareasEquipoPage from '../pages/entrenador/tareasEquipo.page';
+import TareasDeportistaPage from '../pages/entrenador/tareasDeportista.page';
 
 const EntrenadorLayout: React.FC = () => {
   const history = useHistory();
@@ -84,10 +89,14 @@ const EntrenadorLayout: React.FC = () => {
         <Route exact path="/entrenador/deportistas" component={DeportistasPage} />
         <Route exact path="/entrenador/deportistas/:id" component={DeportistaDetallePage} />
         <Route exact path="/entrenador/tareas" component={TareasPage} />
+        <Route exact path="/entrenador/tareas-equipo" component={TareasEquipoPage} />
+        <Route exact path="/entrenador/tareas-deportista" component={TareasDeportistaPage} />
         <Route exact path="/entrenador/tareas/:id" component={TareaDetalle}  />
+        <Route exact path="/entrenador/tareas-individual/:id" component={TareaDetIndividual}  />
         <Route exact path="/entrenador/asistencia" component={AsistenciaPage} />
         <Route exact path="/entrenador/asistencia/:asistenciaId/deportistas" component={AsistenciaCheckPage} />
         <Route exact path="/entrenador/calendario" component={CalendarioPage} />
+        <Route exact path="/entrenador/tutorial" component={TutorialPage} />
         <Route exact path="/entrenador/perfil" component={EntrenadorPerfilPage}/>
         <Route exact path="/entrenador/notificaciones">
           <div className="ion-padding">
@@ -123,6 +132,10 @@ const EntrenadorLayout: React.FC = () => {
         <IonTabButton tab="deportistas" href="/entrenador/deportistas">
           <IonIcon icon={personOutline} />
           <IonLabel>Deportistas</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="tutorial" href="/entrenador/tutorial">
+          <IonIcon icon={bookOutline} />
+          <IonLabel>Tutorial</IonLabel>
         </IonTabButton>
         <IonTabButton tab="perfil" href="/entrenador/perfil">
           <IonIcon icon={personOutline} />

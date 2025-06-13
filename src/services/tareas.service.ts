@@ -9,6 +9,26 @@ export const tareaService = {
       if (error) throw error;
       return data;
     },
+
+    async getAllEquipo(): Promise<Tarea[]> {
+      const { data, error } = await supabase.from('tareas')
+        .select('*')
+        .not('equipo_id', 'is', null)
+        .neq('estado', 0)
+        .order('fecha_vencimiento', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+
+    async getAllIndividual(): Promise<Tarea[]> {
+      const { data, error } = await supabase.from('tareas')
+        .select('*')
+        .is('equipo_id', null)
+        .neq('estado', 0)
+        .order('fecha_vencimiento', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
   
     async getByEquipo(equipoId: string) {
       const { data, error } = await supabase
@@ -51,8 +71,15 @@ export const tareaService = {
       return data;
     },
   
-    async delete(id: string): Promise<void> {
-      const { error } = await supabase.from('tareas').delete().eq('id', id);
+    async deleteDeportistaTarea(id: number): Promise<void> {
+      const { error } = await supabase.from('tarea_deportista').delete().eq('id', id);
+      if (error) throw error;
+    },
+
+    async delete(id:string) : Promise<void> {
+      const  {error } = await supabase.from('tareas')
+      .update({estado: 0})
+      .eq('id', id); 
       if (error) throw error;
     },
 
@@ -126,52 +153,35 @@ export const tareaService = {
       }
     },
 
-  getEstadoColor(estado: number) {
-    switch (estado) {
-      case 1:
-        return 'warning';
-      case 2:
-        return 'primary';
-      case 3:
-        return 'success';
-      case 4:
-        return 'success';  
-      default:
-        return 'medium';
-    }
-  },
-
-  getEstadoTexto(estado: number) {
-    switch (estado) {
-      case 1:
-        return 'Pendiente';
-      case 2:
-        return 'En Progreso';
-      case 3:
-        return 'Completado';
-      case 4:
-        return 'Evaluado';
-      default:
-        return estado;
-    }
-  },
-
-    getEstadoIcono(estado: number) {
-    switch (estado) {
-      case 1:
-        return timeOutline;
-      case 3:
-        return checkmarkCircleOutline;
-      case 4:
-        return checkmarkCircleOutline;
-      default:
-        return timeOutline;
-    }
-  },
-
   guardarEvaluacion: async (id: number, nota: number, observacion: string, entrenador_id: string) => {
     const { error } = await supabase.from('tarea_deportista').update({ nota: nota, observacion: observacion, entrenador_id: entrenador_id, estado:4 }).eq('id', id);
 
     if (error) throw error;
-  }
+  },
+
+    async crear_tarea_individual(titulo: string,descripcion: string, deportista_id: string, entrenador_id: string, fecha_vencimiento: string, estado: number, req_eva: boolean): Promise<void> {
+      const { error } = await supabase.rpc('crear_tarea_individual',{
+        tit: titulo,
+        decrip: descripcion,
+        dep_id: deportista_id,
+        ent_id: entrenador_id,
+        fecha_v: fecha_vencimiento,
+        est: estado,
+        req_e: req_eva
+      });
+      if (error) throw error;
+    },
+
+    async crear_tarea_individual_multiple(titulo: string, descripcion: string, deportista_ids: string[], entrenador_id: string, fecha_vencimiento: string, estado: number, req_eva: boolean): Promise<void> {
+      const { error } = await supabase.rpc('crear_tarea_individual_multiple', {
+        tit: titulo,
+        decrip: descripcion,
+        dep_ids: deportista_ids,
+        ent_id: entrenador_id,
+        fecha_v: fecha_vencimiento,
+        est: estado,
+        req_e: req_eva
+      });
+      if (error) throw error;
+    },
 };

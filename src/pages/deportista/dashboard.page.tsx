@@ -20,6 +20,7 @@ import { tareaService } from '../../services/tareas.service';
 import { Tarea } from '../../models/supabase.model';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import AppHeader from '../../components/AppHeader';
+import tareaHelper from '../../utils/tareaHelper';
 
 const DeportistaDashboardPage: React.FC = () => {
   const [tareasPendientes, setTareasPendientes] = useState<Tarea[]>([]);
@@ -59,8 +60,8 @@ const DeportistaDashboardPage: React.FC = () => {
                     <p>
                       <IonIcon icon={time} /> {new Date(tarea.fecha_vencimiento).toLocaleDateString()}
                     </p>
-                    <IonChip color={tareaService.getEstadoColor(tarea.estado)}>
-                      {tareaService.getEstadoTexto(tarea.estado)}
+                    <IonChip color={tareaHelper.getEstadoColor(tarea.estado)}>
+                      {tareaHelper.getEstadoTexto(tarea.estado)}
                     </IonChip>
                   </IonLabel>
                 </IonItem>

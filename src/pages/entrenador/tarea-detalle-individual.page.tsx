@@ -16,7 +16,7 @@ import {
   IonRange,
   IonTextarea,
 } from '@ionic/react';
-import { time, person, checkbox, car } from 'ionicons/icons';
+import { time, person, checkbox, car, trash } from 'ionicons/icons';
 import React, { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { tareaService } from '../../services/tareas.service';
@@ -28,6 +28,7 @@ import AccessibleModal from '../../components/AccessibleModal';
 import './range.css';
 import { AuthService } from '../../services/auth.service';
 import tareaHelper from '../../utils/tareaHelper';
+import AccessibleAlert from '../../components/AccessibleAlert';
 
 
 interface DeportistaTarea {
@@ -40,7 +41,7 @@ interface DeportistaTarea {
   idx: number;
 }
 
-const TareaDetalle: React.FC = () => {
+const TareaDetIndividual: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
   const [tarea, setTarea] = useState<Tarea | null>(null);
@@ -57,6 +58,8 @@ const TareaDetalle: React.FC = () => {
     observacion: '',
     entrenador_id: user?.id || '',
   })
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [deportistaTareaToDelete, setDeportistaTareaToDelete] = useState<number | null>(null);
 
   useEffect(() => {
     cargarDatos();
@@ -99,6 +102,28 @@ const TareaDetalle: React.FC = () => {
       setShowToast(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+   const handleDelete = async (id: number) => {
+    setDeportistaTareaToDelete(id);
+    setShowDeleteAlert(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deportistaTareaToDelete) return;
+
+    setLoading(true);
+    try {
+      await tareaService.deleteDeportistaTarea(deportistaTareaToDelete);
+      setToastMessage('Tarea eliminada correctamente');
+      cargarDatos();
+    } catch (error) {
+      console.error('Error al eliminar tarea:', error);
+      setToastMessage('Error al eliminar la tarea');
+    } finally {
+      setLoading(false);
+      setDeportistaTareaToDelete(null);
     }
   };
 
@@ -172,14 +197,23 @@ const TareaDetalle: React.FC = () => {
                       {tareaHelper.getEstadoTexto(deportista.estado)}
                     </IonBadge>
                   </p>
-                  <p>Asignado: <b>{formatoFechaHora(deportista.fecha_asignacion)}</b>
+                  <p>Asignado: <b>{formatoFechaHora(deportista.fecha_asignacion)}</b></p>
                     {deportista.fecha_realizacion && (
-                      <>{' - '} Realizado:
-                        <b>{new Date(deportista.fecha_realizacion).toLocaleDateString()} </b>
+                      <><p>Realizado:
+                        <b>{formatoFechaHora(deportista.fecha_realizacion)} </b></p>
                       </>
-                    )}
-                  </p>
+                    )}                  
                 </IonLabel>
+                {deportista.estado === 1 && (
+                <IonButtons slot="end">
+                  <IonButton onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(deportista.idx);
+                  }}>
+                    <IonIcon icon={trash} color='danger' />
+                  </IonButton>
+                </IonButtons>
+                )}
               </IonItem>
             );
           })}
@@ -241,9 +275,29 @@ const TareaDetalle: React.FC = () => {
           duration={2000}
           color={toastColor}
         />
+         <AccessibleAlert
+          isOpen={showDeleteAlert}
+          onDidDismiss={() => {
+            setShowDeleteAlert(false);
+            setDeportistaTareaToDelete(null);
+          }}
+          header="Confirmar eliminación"
+          message="¿Está seguro que desea eliminar a Deportista? Esta acción no se puede deshacer."
+          buttons={[
+            {
+              text: 'Cancelar',
+              role: 'cancel',
+              cssClass: 'secondary'
+            },
+            {
+              text: 'Eliminar',
+              handler: confirmDelete
+            }
+          ]}
+        />
       </IonContent>
     </IonPage>
   );
 };
 
-export default TareaDetalle;
+export default TareaDetIndividual;

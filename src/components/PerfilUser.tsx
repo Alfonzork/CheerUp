@@ -34,9 +34,8 @@ interface PerfilData {
   nombres: string;
   ap_paterno: string;
   ap_materno: string;
-  fecha_nacimiento: string;
   email: string;
-  telefono: string;
+  fono: string;
   avatar?: string;
 }
 
@@ -47,33 +46,31 @@ const PerfilUser: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [nuevaPassword, setNuevaPassword] = useState('');
   const [confirmarPassword, setConfirmarPassword] = useState('');
-  const [limiteRegistros, setLimiteRegistros] = useState(20);
 
   useEffect(() => {
     cargarPerfil();
-  }, [limiteRegistros]);
+  }, []);
 
   const cargarPerfil = async () => {
-    try {
-      setLoading(true);
+    setLoading(true);
+    try {      
       const user = await AuthService.getCurrentUser();
       if (!user) throw new Error('Usuario no autenticado');
 
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .limit(limiteRegistros)
-        .single();
-
-      if (error) throw error;
+      const data = await AuthService.getUser(user.id);
+      setPerfil({
+        id: data.id,
+        run: data.run || '',
+        nombres: data.nombres || '',
+        ap_paterno: data.ap_paterno || '',
+        ap_materno: data.ap_materno || '',
+        email: data.email || '',
+        fono: data.fono || '',
+        avatar: `${SUPABASE_STORAGE_URL}/users/${data.avatar}` || ''
+      });
 
       // Obtener la URL de la imagen del storage
-      if (data.avatar) {
-        data.avatar = `${SUPABASE_STORAGE_URL}/users/${data.avatar}`;
-      }
 
-      setPerfil(data);
     } catch (error) {
       console.error('Error al cargar perfil:', error);
       setToastMessage('Error al cargar el perfil');
@@ -83,81 +80,81 @@ const PerfilUser: React.FC = () => {
     }
   };
 
-  const handleCambiarImagen = async () => {
-    try {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
+  // const handleCambiarImagen = async () => {
+  //   try {
+  //     const input = document.createElement('input');
+  //     input.type = 'file';
+  //     input.accept = 'image/*';
       
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (!file) return;
+  //     input.onchange = async (e) => {
+  //       const file = (e.target as HTMLInputElement).files?.[0];
+  //       if (!file) return;
 
-        setLoading(true);
-        try {
-          const user = await AuthService.getCurrentUser();
-          if (!user) throw new Error('Usuario no autenticado');
+  //       setLoading(true);
+  //       try {
+  //         const user = await AuthService.getCurrentUser();
+  //         if (!user) throw new Error('Usuario no autenticado');
 
-          // Opciones de compresión
-          const options = {
-            maxSizeMB: 1,
-            maxWidthOrHeight: 1024,
-            useWebWorker: true
-          };
+  //         // Opciones de compresión
+  //         const options = {
+  //           maxSizeMB: 1,
+  //           maxWidthOrHeight: 1024,
+  //           useWebWorker: true
+  //         };
 
-          // Comprimir la imagen
-          const compressedFile = await imageCompression(file, options);
-          console.log('Tamaño original:', file.size / 1024 / 1024, 'MB');
-          console.log('Tamaño comprimido:', compressedFile.size / 1024 / 1024, 'MB');
+  //         // Comprimir la imagen
+  //         const compressedFile = await imageCompression(file, options);
+  //         console.log('Tamaño original:', file.size / 1024 / 1024, 'MB');
+  //         console.log('Tamaño comprimido:', compressedFile.size / 1024 / 1024, 'MB');
 
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+  //         const fileExt = file.name.split('.').pop();
+  //         const fileName = `${user.id}-${Math.random()}.${fileExt}`;
 
-          // Subir al bucket 'users'
-          const { error: uploadError } = await supabase.storage
-            .from('users')
-            .upload(fileName, compressedFile);
+  //         // Subir al bucket 'users'
+  //         const { error: uploadError } = await supabase.storage
+  //           .from('users')
+  //           .upload(fileName, compressedFile);
 
-          if (uploadError) throw uploadError;
+  //         if (uploadError) throw uploadError;
 
-          // Construir la URL completa usando SUPABASE_STORAGE_URL
-          const imageUrl = `${SUPABASE_STORAGE_URL}/users/${fileName}`;
+  //         // Construir la URL completa usando SUPABASE_STORAGE_URL
+  //         const imageUrl = `${SUPABASE_STORAGE_URL}/users/${fileName}`;
 
-          // Actualizar el perfil con la nueva URL
-          const { error: updateError } = await supabase
-            .from('users')
-            .update({ avatar: fileName })
-            .eq('id', user.id);
+  //         // Actualizar el perfil con la nueva URL
+  //         const { error: updateError } = await supabase
+  //           .from('users')
+  //           .update({ avatar: fileName })
+  //           .eq('id', user.id);
 
-          if (updateError) throw updateError;
+  //         if (updateError) throw updateError;
 
-          // Actualizar el estado local
-          setPerfil(prev => {
-            if (!prev) return null;
-            const updatedPerfil = { ...prev, avatar: imageUrl };
+  //         // Actualizar el estado local
+  //         setPerfil(prev => {
+  //           if (!prev) return null;
+  //           const updatedPerfil = { ...prev, avatar: imageUrl };
             
-            // Actualizar localStorage con los nuevos datos
-            const userData = JSON.parse(localStorage.getItem('user') || '{}');
-            userData.avatar = imageUrl;
-            localStorage.setItem('user', JSON.stringify(userData));
+  //           // Actualizar localStorage con los nuevos datos
+  //           const userData = JSON.parse(localStorage.getItem('user') || '{}');
+  //           userData.avatar = imageUrl;
+  //           localStorage.setItem('user', JSON.stringify(userData));
             
-            return updatedPerfil;
-          });
+  //           return updatedPerfil;
+  //         });
 
-          setToastMessage('Imagen actualizada correctamente');
-          setShowToast(true);
-        } finally {
-          setLoading(false);
-        }
-      };
+  //         setToastMessage('Imagen actualizada correctamente');
+  //         setShowToast(true);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     };
 
-      input.click();
-    } catch (error) {
-      console.error('Error al cambiar imagen:', error);
-      setToastMessage('Error al cambiar la imagen');
-      setShowToast(true);
-    }
-  };
+  //     input.click();
+  //   } catch (error) {
+  //     console.error('Error al cambiar imagen:', error);
+  //     setToastMessage('Error al cambiar la imagen');
+  //     setShowToast(true);
+  //   }
+  // };
 
   const handleCambiarPassword = async () => {
     try {
@@ -202,10 +199,10 @@ const PerfilUser: React.FC = () => {
                     <IonAvatar style={{ width: '100px', height: '100px', margin: '0 auto' }}>
                       <img src={perfil.avatar || '/default-avatar.png'} alt="Avatar" />
                     </IonAvatar>
-                    <IonButton  onClick={handleCambiarImagen}>
+                    {/* <IonButton  onClick={handleCambiarImagen}>
                       <IonIcon icon={camera} slot="start" />
                       Cambiar Imagen
-                    </IonButton>
+                    </IonButton> */}
                   </div>
                 </IonCardHeader>
                 <IonCardContent>
@@ -227,20 +224,12 @@ const PerfilUser: React.FC = () => {
                       <IonText>{perfil.ap_materno}</IonText>
                     </IonItem>
                     <IonItem>
-                      <IonLabel position="stacked">Fecha de Nacimiento</IonLabel>
-                      <IonText>
-                        {perfil.fecha_nacimiento
-                          ? new Date(perfil.fecha_nacimiento).toLocaleDateString()
-                          : ''}
-                      </IonText>
-                    </IonItem>
-                    <IonItem>
                       <IonLabel position="stacked">Email</IonLabel>
                       <IonText>{perfil.email}</IonText>
                     </IonItem>
                     <IonItem>
                       <IonLabel position="stacked">Teléfono</IonLabel>
-                      <IonText>{perfil.telefono}</IonText>
+                      <IonText>{perfil.fono}</IonText>
                     </IonItem>
                   </IonList>
                 </IonCardContent>

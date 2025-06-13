@@ -80,3 +80,26 @@ export type Deportista = {
     ubicacion: string;
     created_at: string;
   } 
+
+  export interface Nivel {
+      id: number;
+      name: string;
+      description: string;
+      exercises: Exercises[]; // Agregado para evitar el error
+  }
+  
+  export interface Exercises {
+      id: string;
+      name: string;
+      description: string;
+      difficulty_id: number;
+      exercise_media: Exercise_media[]; // Agregado para evitar el error
+  }
+  
+  export interface Exercise_media {
+      id: string;
+      url: string;
+      media_type: string;
+      position: number;
+      exercise_id: string;
+  }

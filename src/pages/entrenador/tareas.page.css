@@ -1,0 +1,47 @@
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.task-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.task-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-icon {
+  font-size: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+ion-card-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  color: var(--ion-color-primary);
+}
+
+ion-card-content {
+  padding: 16px;
+}
+
+ion-card-content p {
+  color: var(--ion-color-medium);
+  margin-bottom: 16px;
+}
+
+ion-button {
+  --color: var(--ion-color-primary);
+  font-weight: 500;
+} 

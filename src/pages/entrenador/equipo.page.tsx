@@ -32,7 +32,7 @@ import {
   import { useHistory } from 'react-router';
   import LoadingOverlay from '../../components/LoadingOverlay';
   import AccessibleModal from '../../components/AccessibleModal';
-import AppHeader from '../../components/AppHeader';
+  import AppHeader from '../../components/AppHeader';
   
   interface Entrenador {
     id: number;

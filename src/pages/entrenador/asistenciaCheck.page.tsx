@@ -21,6 +21,7 @@ import { asistenciaService } from '../../services/asistencia.service';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import AccessibleModal from '../../components/AccessibleModal';
 import BackButton from '../../components/BackButton';
+import { formatoFecha } from '../../utils/dateHelper';
 
 const estados = [
   { value: 'presente', label: 'Presente' },
@@ -123,7 +124,7 @@ const AsistenciaCheckPage: React.FC = () => {
           </IonButtons>
           <IonTitle>
             {equipoNombre && fecha
-              ? `${equipoNombre} - ${new Date(fecha).toLocaleDateString()}`
+              ? `${equipoNombre} - ${formatoFecha(fecha)}`
               : 'Asistencia'}
           </IonTitle>
         </IonToolbar>

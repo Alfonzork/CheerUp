@@ -20,6 +20,7 @@ import { tareaService } from '../../services/tareas.service';
 import { Tarea } from '../../models/supabase.model';
 import LoadingOverlay from '../../components/LoadingOverlay';
 import AppHeader from '../../components/AppHeader';
+import tareaHelper from '../../utils/tareaHelper';
 
 const DeportistaTareasPage: React.FC = () => {
   const [tareas, setTareas] = useState<Tarea[]>([]);
@@ -74,8 +75,8 @@ const DeportistaTareasPage: React.FC = () => {
                 <h2>{tarea.titulo}</h2>
                 <p>{tarea.descripcion}</p>
                 <p>
-                  <IonChip color={tareaService.getEstadoColor(tarea.estado)}>
-                    {tareaService.getEstadoTexto(tarea.estado)}
+                  <IonChip color={tareaHelper.getEstadoColor(tarea.estado)}>
+                    {tareaHelper.getEstadoTexto(tarea.estado)}
                   </IonChip>
                 </p>
                 <p>

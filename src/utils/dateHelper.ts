@@ -6,3 +6,16 @@ export const formatoFecha = (fecha: string): string => {
     year: 'numeric'
   });
 };
+
+export const formatoFechaHora = (datetime: string): string => {
+  const date = new Date(datetime);
+  const offsetMs = date.getTimezoneOffset();
+  const localDate = new Date(date.getTime() - offsetMs);
+  return localDate.toLocaleString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}

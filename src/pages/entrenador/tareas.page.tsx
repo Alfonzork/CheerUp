@@ -1,412 +1,61 @@
-import { 
-    IonContent, 
-    IonHeader, 
-    IonPage, 
-    IonTitle, 
-    IonToolbar,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonButton,
-    IonIcon,
-    IonFab,
-    IonFabButton,
-    IonModal,
-    IonInput,
-    IonSelect,
-    IonSelectOption,
-    IonButtons,
-    IonToast,
-    IonDatetime,
-    IonChip,
-    IonBadge,
-    IonTextarea,
-    IonCheckbox
-  } from '@ionic/react';
-import { alertController } from '@ionic/core';
-import { add, create, trash, checkmarkCircle, time, list } from 'ionicons/icons';
-import React, { useEffect, useState } from 'react';
-import { equipoService } from '../../services/equipos.service';
-import { tareaService } from '../../services/tareas.service';
-import { subscribeToChanges } from '../../services/changes.service';
-import { Tarea, Equipo } from '../../models/supabase.model';
-import LoadingOverlay from '../../components/LoadingOverlay';
-import AccessibleModal from '../../components/AccessibleModal';
-import AccessibleAlert from '../../components/AccessibleAlert';
-import { AuthService } from '../../services/auth.service';
+import {
+  IonContent,
+  IonPage,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonIcon,
+  IonGrid,
+  IonRow,
+  IonCol
+} from '@ionic/react';
+import { people, peopleOutline, person, personOutline } from 'ionicons/icons';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import AppHeader from '../../components/AppHeader';
-import { formatoFecha } from '../../utils/dateHelper';
 
-  
-const Tareas: React.FC = () => {
-  const [tareas, setTareas] = useState<Tarea[]>([]);
-  const [equipos, setEquipos] = useState<Equipo[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [tareaEditar, setTareaEditar] = useState<Tarea | null>(null);
-  const [filtroEquipo, setFiltroEquipo] = useState<string>('');
-  const [formData, setFormData] = useState({
-    titulo: '',
-    descripcion: '',
-    fecha_vencimiento: '',
-    estado: 1,
-    equipo_id: '',
-    req_eva: false
-  });
-  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [tareaToDelete, setTareaToDelete] = useState<string | null>(null);
+const TareasPage: React.FC = () => {
   const history = useHistory();
-
-  const cargarDatos = async () => {
-    try {
-      const [tareasData, equiposData] = await Promise.all([
-        tareaService.getAll(),
-        equipoService.getAll()
-      ]);
-      setTareas(tareasData);
-      setEquipos(equiposData);
-    } catch (error) {
-      console.error('Error al cargar datos:', error);
-      setToastMessage('Error al cargar los datos');
-      setShowToast(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    cargarDatos();
-
-    // Suscribirse a cambios en tiempo real
-    const subscription = subscribeToChanges('tareas', (payload) => {
-      console.log('Cambio detectado:', payload);
-      cargarDatos(); // Recargar datos cuando hay cambios
-    });
-
-    // Limpiar suscripción al desmontar el componente
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const user = AuthService.getCurrentUser();
-      //console.log('FormData antes de procesar:', formData);
-      
-      const tareaData = {
-        titulo: formData.titulo.trim(),
-        descripcion: formData.descripcion.trim(),
-        equipo_id: formData.equipo_id,
-        entrenador_id: user?.id || '',
-        estado: formData.estado,
-        fecha_vencimiento: formData.fecha_vencimiento,
-        updated_at: new Date().toISOString(),
-        req_eva: formData.req_eva
-      };
-      
-      //console.log('Datos a enviar:', tareaData);
-
-      if (tareaEditar) {
-        //console.log('Actualizando tarea:', tareaEditar.id);
-        const updatedTarea = await tareaService.update(tareaEditar.id, tareaData);
-        //console.log('Tarea actualizada:', updatedTarea);
-        setToastMessage('Tarea actualizada correctamente');
-      } else {
-        await tareaService.crear_tarea(formData.titulo.trim(), formData.descripcion.trim(), formData.equipo_id, user?.id || '', formData.fecha_vencimiento, formData.estado, formData.req_eva);
-        setToastMessage('Tarea creada correctamente');
-      }
-      setShowModal(false);
-      cargarDatos();
-    } catch (error) {
-      console.log(formData)
-      console.error('Error al guardar tarea:', error);
-      setToastMessage('Error al guardar la tarea');
-    } finally {
-      setLoading(false);
-      setShowToast(true);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    setTareaToDelete(id);
-    setShowDeleteAlert(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!tareaToDelete) return;
-    
-    setLoading(true);
-    try {
-      await tareaService.delete(tareaToDelete);
-      setToastMessage('Tarea eliminada correctamente');
-      cargarDatos();
-    } catch (error) {
-      console.error('Error al eliminar tarea:', error);
-      setToastMessage('Error al eliminar la tarea');
-    } finally {
-      setLoading(false);
-      setTareaToDelete(null);
-    }
-  };
-
-  const abrirModalEditar = (tarea: Tarea) => {
-    //console.log('Abriendo modal para editar tarea:', tarea);
-    setTareaEditar(tarea);
-    setFormData({
-      titulo: tarea.titulo,
-      descripcion: tarea.descripcion || '',
-      fecha_vencimiento: tarea.fecha_vencimiento,
-      estado: tarea.estado,
-      equipo_id: tarea.equipo_id.toString(),
-      req_eva: tarea.req_eva || false
-    });
-    setShowModal(true);
-  };
-
-  const abrirModalCrear = () => {
-    setTareaEditar(null);
-    setFormData({
-      titulo: '',
-      descripcion: '',
-      fecha_vencimiento: '',
-      estado: 1,
-      equipo_id: '',
-      req_eva: false
-    });
-    setShowModal(true);
-  };
-
-  const getEstadoColor = (estado: number) => {
-    switch (estado) {
-      case 1:
-        return 'warning';
-      case 2:
-        return 'primary';
-      case 3:
-        return 'success';
-      default:
-        return 'medium';
-    }
-  };
-
-  const getEstadoTexto = (estado: number) => {
-    switch (estado) {
-      case 1:
-        return 'Pendiente';
-      case 2:
-        return 'En Progreso';
-      case 3:
-        return 'Completada';
-      default:
-        return estado;
-    }
-  };
-
-  const getEquipoNombre = (equipoId: string) => {
-    const equipo = equipos.find(e => e.id.toString() === equipoId);
-    return equipo ? equipo.nombre : 'Sin equipo';
-  };
-
-  const tareasFiltradas = tareas.filter(tarea => 
-    !filtroEquipo || tarea.equipo_id.toString() === filtroEquipo
-  );
-
-  const handleTareaClick = (tareaId: string) => {
-    history.push(`/entrenador/tareas/${tareaId}`);
-  };
 
   return (
     <IonPage>
       <AppHeader title="Tareas" />
-      <IonContent className="ion-padding">
-        <IonSelect
-          value={filtroEquipo}
-          onIonChange={e => setFiltroEquipo(e.detail.value)}
-          placeholder="Filtrar por equipo"
-          className="ion-margin-bottom"
-          style={{
-            '--background': '#2c2c2c',
-            '--color': '#ffffff',
-            '--placeholder-color': '#999999',
-            '--padding-start': '16px',
-            '--padding-end': '16px',
-            '--padding-top': '8px',
-            '--padding-bottom': '8px',
-            '--border-radius': '8px'
-          }}
-        >
-          <IonSelectOption value="">Todos los equipos</IonSelectOption>
-          {equipos.map(equipo => (
-            <IonSelectOption key={equipo.id} value={equipo.id.toString()}>
-              {equipo.nombre}
-            </IonSelectOption>
-          ))}
-        </IonSelect>
+      <IonContent>      
+        <IonGrid>
+          <IonRow>
+            <IonCol size="12" sizeMd="6">
+              <IonCard button onClick={() => history.push('/entrenador/tareas-equipo')} style={{ marginBottom: '16px', background: '#dddddd', color: '#000000', borderRadius: '12px', boxShadow: '0 4px 12px rgba(81, 233, 21, 0.1)' }}>
+                <IonCardHeader>
+                  <IonCardTitle style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <IonIcon icon={peopleOutline} color="danger"/>
+                    Tareas de Equipo
+                  </IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  Gestiona las tareas asignadas a equipos completos. Crea, edita y realiza seguimiento de las actividades grupales.
+                </IonCardContent>
+              </IonCard>
+            </IonCol>
 
-        <IonList>
-          {tareasFiltradas.map((tarea) => (
-            <IonItem key={tarea.id} button onClick={() => handleTareaClick(tarea.id)}>
-              <IonLabel>
-                <h2>{tarea.titulo}</h2>
-                <p>
-                  <IonBadge color={getEstadoColor(tarea.estado)}>
-                    {getEstadoTexto(tarea.estado)}
-                  </IonBadge>
-                </p>
-              </IonLabel>
-              <IonLabel>                
-                <p>{tarea.descripcion}</p>
-                <p>
-                  <IonIcon icon={time} /> {formatoFecha(tarea.fecha_vencimiento)}
-                </p>
-                <p>Equipo: {getEquipoNombre(tarea.equipo_id.toString())}</p>
-              </IonLabel>
-              <IonButtons slot="end">
-                <IonButton onClick={(e) => {
-                  e.stopPropagation();
-                  abrirModalEditar(tarea);
-                }}>
-                  <IonIcon icon={create} color='primary'/>
-                </IonButton>
-                <IonButton onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(tarea.id);
-                }}>
-                  <IonIcon icon={trash} color='danger'/>
-                </IonButton>
-              </IonButtons>
-            </IonItem>
-          ))}
-        </IonList>
-
-        <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={abrirModalCrear} color="warning">
-            <IonIcon icon={add} />
-          </IonFabButton>
-        </IonFab>
-
-        <AccessibleModal
-          isOpen={showModal}
-          onDidDismiss={() => setShowModal(false)}
-          breakpoints={[0, 0.8]}
-          initialBreakpoint={0.8}
-          aria-modal="true"
-        >
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>{tareaEditar ? 'Editar Tarea' : 'Nueva Tarea'}</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowModal(false)}>Cerrar</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <form onSubmit={handleSubmit}>
-              <IonInput
-                label="Título"
-                labelPlacement="floating"
-                value={formData.titulo}
-                onIonChange={e => setFormData({...formData, titulo: e.detail.value!})}
-                required
-              />
-              <IonTextarea
-                label="Descripción"
-                labelPlacement="floating"
-                value={formData.descripcion}
-                onIonChange={e => setFormData({...formData, descripcion: e.detail.value!})}
-                rows={3}
-                autoGrow={true}
-                required
-              />
-              <IonInput
-                type="date"
-                label="Fecha Límite"
-                labelPlacement="floating"
-                value={formData.fecha_vencimiento}
-                onIonChange={e => setFormData({...formData, fecha_vencimiento: e.detail.value!})}
-                required
-              />
-              <IonSelect
-                label="Estado"
-                labelPlacement="floating"
-                value={formData.estado}
-                onIonChange={e => setFormData({...formData, estado: e.detail.value})}
-                required
-                interface="action-sheet"
-                className="custom-select"
-              >
-                <IonSelectOption value="1">Pendiente</IonSelectOption>
-                <IonSelectOption value="2">En Progreso</IonSelectOption>
-                <IonSelectOption value="3">Completada</IonSelectOption>
-              </IonSelect>
-
-              <IonSelect
-                label="Equipo"
-                labelPlacement="floating"
-                value={formData.equipo_id}
-                onIonChange={e => setFormData({...formData, equipo_id: e.detail.value})}
-                required
-                interface="action-sheet"
-                className="custom-select"
-              >
-                {equipos.map(equipo => (
-                  <IonSelectOption key={equipo.id} value={equipo.id.toString()}>
-                    {equipo.nombre}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-              <IonCheckbox 
-              checked={formData.req_eva}
-              onIonChange={e => setFormData({...formData, req_eva: e.detail.checked})}
-              justify='space-between'
-              className="custom-select"
-              >Evaluar Tarea
-              </IonCheckbox>
-
-              <IonButton expand="block" type="submit" className="ion-margin-top">
-                {tareaEditar ? 'Actualizar' : 'Crear'}
-              </IonButton>
-            </form>
-          </IonContent>
-        </AccessibleModal>
-
-        <LoadingOverlay isOpen={loading} message="Cargando..." />
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={toastMessage}
-          duration={2000}
-        />
-
-        <AccessibleAlert
-          isOpen={showDeleteAlert}
-          onDidDismiss={() => {
-            setShowDeleteAlert(false);
-            setTareaToDelete(null);
-          }}
-          header="Confirmar eliminación"
-          message="¿Está seguro que desea eliminar esta tarea? Esta acción no se puede deshacer."
-          buttons={[
-            {
-              text: 'Cancelar',
-              role: 'cancel',
-              cssClass: 'secondary'
-            },
-            {
-              text: 'Eliminar',
-              handler: confirmDelete
-            }
-          ]}
-        />
+            <IonCol size="12" sizeMd="6">
+              <IonCard button onClick={() => history.push('/entrenador/tareas-deportista')} style={{ marginBottom: '16px', background: '#dddddd', color: '#000000', borderRadius: '12px', boxShadow: '0 4px 12px rgba(81, 233, 21, 0.1)' }}>
+                <IonCardHeader>
+                  <IonCardTitle style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <IonIcon icon={personOutline} color="danger" />
+                    Tareas de Deportista
+                  </IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <p>Administra las tareas individuales de los deportistas. Asigna, modifica y evalúa las actividades personales.</p>
+                </IonCardContent>
+              </IonCard>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
       </IonContent>
     </IonPage>
   );
 };
 
-export default Tareas; 
+export default TareasPage; 
